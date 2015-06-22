@@ -15,7 +15,7 @@ install:
 
     - mkdir ~/.luarocks
     - echo "rocks_servers = {[[http://rocks.tarantool.org/]]}" >> ~/.luarocks/config.lua
-    - luarocks install queue
+    - luarocks install queue --local
 
     - composer install
 
