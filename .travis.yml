@@ -12,7 +12,8 @@ before_install:
 
 install:
     - sudo apt-get -y install tarantool php5-tarantool luarocks
-    - sudo php5enmod tarantool
+
+    - printf "extension = tarantool.so\n" >> ~/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/php.ini;
 
     - mkdir ~/.luarocks
     - echo "rocks_servers = {[[http://rocks.tarantool.org/]]}" >> ~/.luarocks/config.lua
