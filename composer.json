@@ -1,0 +1,32 @@
+{
+    "name": "tarantool/queue",
+    "description": "PHP bindings for Tarantool Queue.",
+    "keywords": ["queue", "schedule", "delayed", "priority", "ttl", "ttr", "task", "job", "tarantool"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eugene Leonovich",
+            "email": "gen.work@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "ext-tarantool": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tarantool\\Queue\\": "src/"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4": {
+            "Tarantool\\Queue\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
