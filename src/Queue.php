@@ -21,20 +21,21 @@ class Queue
      */
     public function put($data, array $options = null)
     {
-        $result = $this->client->call($this->prefix.'put', [$data, (array) $options]);
+        $args = $options ? [$data, $options] : [$data];
+        $result = $this->client->call($this->prefix.'put', $args);
 
         return Task::createFromTuple($result[0]);
     }
 
     /**
-     * @param int|null $timeout
+     * @param float|null $timeout
      *
      * @return Task|null
      */
     public function take($timeout = null)
     {
-        $options = null === $timeout ? [] : [(float) $timeout];
-        $result = $this->client->call($this->prefix.'take', $options);
+        $args = null === $timeout ? [] : [$timeout];
+        $result = $this->client->call($this->prefix.'take', $args);
 
         return empty($result[0]) ? null : Task::createFromTuple($result[0]);
     }
@@ -59,7 +60,8 @@ class Queue
      */
     public function release($taskId, array $options = null)
     {
-        $result = $this->client->call($this->prefix.'release', [$taskId, (array) $options]);
+        $args = $options ? [$taskId, $options] : [$taskId];
+        $result = $this->client->call($this->prefix.'release', $args);
 
         return Task::createFromTuple($result[0]);
     }
