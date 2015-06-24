@@ -9,24 +9,24 @@ use Tarantool\Queue\Task;
 abstract class QueueTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Tarantool
-     */
-    private static $tarantool;
-
-    /**
      * @var Queue
      */
     protected $queue;
 
+    /**
+     * @var \Tarantool
+     */
+    private static $client;
+
     public static function setUpBeforeClass()
     {
-        self::$tarantool = new \Tarantool(getenv('TNT_HOST'), getenv('TNT_PORT'));
+        self::$client = new \Tarantool(getenv('TNT_HOST'), getenv('TNT_PORT'));
     }
 
     public static function tearDownAfterClass()
     {
-        self::$tarantool->close();
-        self::$tarantool = null;
+        self::$client->close();
+        self::$client = null;
     }
 
     protected function setUp()
@@ -34,8 +34,8 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $tubeType = $this->getTubeType();
         $tubeName = uniqid(sprintf('t_%s_', $tubeType));
 
-        self::$tarantool->call('queue._create_tube', [$tubeName, $tubeType]);
-        $this->queue = new Queue(self::$tarantool, $tubeName);
+        self::$client->call('queue._create_tube', [$tubeName, $tubeType]);
+        $this->queue = new Queue(self::$client, $tubeName);
     }
 
     protected function tearDown()
