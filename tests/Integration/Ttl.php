@@ -4,10 +4,11 @@ namespace Tarantool\Queue\Tests\Integration;
 
 trait Ttl
 {
+    /**
+     * @eval queue.tube['%tube_name%']:put('ttr_1', { ttr = 1})
+     */
     public function testTimeToRun()
     {
-        $this->queue->put('ttr_1', ['ttr' => 1]);
-
         $task1 = $this->queue->take(.1);
         sleep(1);
         $task2 = $this->queue->take(.1);
@@ -17,21 +18,23 @@ trait Ttl
         $this->assertEquals($task1, $task2);
     }
 
+    /**
+     * @eval queue.tube['%tube_name%']:put('ttl_1', { ttl = 1})
+     */
     public function testTimeToLive()
     {
-        $this->queue->put('ttl_1', ['ttl' => 1]);
-
         sleep(1);
         $task = $this->queue->take(.1);
 
         $this->assertNull($task);
     }
 
+    /**
+     * @eval queue.tube['%tube_name%']:put('pri_low', { pri = 2})
+     * @eval queue.tube['%tube_name%']:put('pri_high', { pri = 1})
+     */
     public function testPriority()
     {
-        $this->queue->put('pri_low', ['pri' => 2]);
-        $this->queue->put('pri_high', ['pri' => 1]);
-
         $task1 = $this->queue->take(.1);
         $this->queue->delete($task1->getId());
 
@@ -42,9 +45,11 @@ trait Ttl
         $this->assertSame('pri_low', $task2->getData());
     }
 
+    /**
+     * @eval queue.tube['%tube_name%']:put('delay_1', { delay = 1})
+     */
     public function testDelay()
     {
-        $this->queue->put('delay_1', ['delay' => 1]);
         $task = $this->queue->take(.1);
 
         $this->assertNull($task);
