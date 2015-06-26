@@ -23,7 +23,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         $task = Task::createFromTuple($tuple);
 
         $this->assertSame($tuple[0], $task->getId());
-        $this->assertSame($tuple[1], $task->getType());
+        $this->assertSame($tuple[1], $task->getState());
 
         if (3 === count($tuple)) {
             $this->assertSame($tuple[2], $task->getData());

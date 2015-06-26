@@ -5,13 +5,13 @@ namespace Tarantool\Queue;
 final class Task
 {
     private $id;
-    private $type;
+    private $state;
     private $data;
 
-    private function __construct($id, $type, $data = null)
+    private function __construct($id, $state, $data = null)
     {
         $this->id = $id;
-        $this->type = $type;
+        $this->state = $state;
         $this->data = $data;
     }
 
@@ -27,9 +27,9 @@ final class Task
         return $this->id;
     }
 
-    public function getType()
+    public function getState()
     {
-        return $this->type;
+        return $this->state;
     }
 
     public function getData()
@@ -39,26 +39,26 @@ final class Task
 
     public function isReady()
     {
-        return States::READY === $this->type;
+        return States::READY === $this->state;
     }
 
     public function isTaken()
     {
-        return States::TAKEN === $this->type;
+        return States::TAKEN === $this->state;
     }
 
     public function isDone()
     {
-        return States::DONE === $this->type;
+        return States::DONE === $this->state;
     }
 
     public function isBuried()
     {
-        return States::BURIED === $this->type;
+        return States::BURIED === $this->state;
     }
 
     public function isDelayed()
     {
-        return States::DELAYED === $this->type;
+        return States::DELAYED === $this->state;
     }
 }

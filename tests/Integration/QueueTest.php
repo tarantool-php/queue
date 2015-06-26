@@ -200,12 +200,12 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Tarantool\Queue\Task', $task);
     }
 
-    protected function assertTask($task, $expectedId, $expectedType, $expectedData)
+    protected function assertTask($task, $expectedId, $expectedState, $expectedData)
     {
         $this->assertTaskInstance($task);
 
         $this->assertSame($expectedId, $task->getId());
-        $this->assertSame($expectedType, $task->getType());
+        $this->assertSame($expectedState, $task->getState());
         $this->assertSame($expectedData, $task->getData());
     }
 
