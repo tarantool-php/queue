@@ -8,7 +8,7 @@ final class Task
     private $state;
     private $data;
 
-    private function __construct($id, $state, $data = null)
+    private function __construct($id, $state, $data)
     {
         $this->id = $id;
         $this->state = $state;
