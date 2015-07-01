@@ -77,6 +77,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             [['tasks', 'done'], [$stats], $stats['tasks']['done']],
             [['calls'], [$stats], $stats['calls']],
             [['calls', 'put'], [$stats], $stats['calls']['put']],
+            [[], [], null],
             [[null], [$stats], null],
             [[null, null], [$stats], null],
             [[''], [$stats], null],
