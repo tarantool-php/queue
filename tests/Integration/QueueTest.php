@@ -4,7 +4,6 @@ namespace Tarantool\Queue\Tests\Integration;
 
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
-use Tarantool\Queue\Task;
 
 abstract class QueueTest extends \PHPUnit_Framework_TestCase
 {
@@ -172,6 +171,47 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $count = $this->queue->kick(3);
 
         $this->assertSame(3, $count);
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('stat_0')
+     * @eval queue.tube['%tube_name%']:put('stat_1')
+     * @eval queue.tube['%tube_name%']:put('stat_2')
+     * @eval queue.tube['%tube_name%']:put('stat_3')
+     * @eval queue.tube['%tube_name%']:put('stat_4')
+     * @eval queue.tube['%tube_name%']:delete(4)
+     * @eval queue.tube['%tube_name%']:take(.001)
+     * @eval queue.tube['%tube_name%']:release(0)
+     * @eval queue.tube['%tube_name%']:take(.001)
+     * @eval queue.tube['%tube_name%']:ack(0)
+     * @eval queue.tube['%tube_name%']:bury(1)
+     * @eval queue.tube['%tube_name%']:bury(2)
+     * @eval queue.tube['%tube_name%']:kick(1)
+     * @eval queue.tube['%tube_name%']:take(.001)
+     */
+    public function testStatistics()
+    {
+        $stat = $this->queue->statistics();
+
+        $this->assertEquals([
+            'tasks' => [
+                'taken' => 1,
+                'buried' => 1,
+                'ready' => 1,
+                'done' => 2,
+                'delayed' => 0,
+                'total' => 3,
+            ],
+            'calls' => [
+                'ack' => 1,
+                'delete' => 1,
+                'take' => 3,
+                'kick' => 1,
+                'release' => 1,
+                'put' => 5,
+                'bury' => 2,
+            ],
+        ], $stat, '', 0.0, 3, true);
     }
 
     /**

@@ -5,11 +5,13 @@ namespace Tarantool\Queue;
 class Queue
 {
     private $client;
+    private $tubeName;
     private $prefix;
 
     public function __construct(\Tarantool $client, $tubeName)
     {
         $this->client = $client;
+        $this->tubeName = $tubeName;
         $this->prefix = "queue.tube.$tubeName:";
     }
 
@@ -28,7 +30,7 @@ class Queue
     }
 
     /**
-     * @param float|null $timeout
+     * @param int|float|null $timeout
      *
      * @return Task|null
      */
@@ -112,5 +114,27 @@ class Queue
         $result = $this->client->call($this->prefix.'delete', [$taskId]);
 
         return Task::createFromTuple($result[0]);
+    }
+
+    /**
+     * @return array|int|null
+     */
+    public function statistics(/* ... */)
+    {
+        $result = $this->client->call('queue.statistics', [$this->tubeName]);
+
+        if (empty($result[0][0])) {
+            return;
+        }
+
+        $result = $result[0][0];
+        foreach (func_get_args() as $arg) {
+            if (!isset($result[$arg])) {
+                return;
+            }
+            $result = $result[$arg];
+        }
+
+        return $result;
     }
 }
