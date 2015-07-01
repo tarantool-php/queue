@@ -5,7 +5,7 @@ namespace Tarantool\Queue\Tests\Integration;
 trait Ttl
 {
     /**
-     * @eval queue.tube['%tube_name%']:put('ttr_1', { ttr = 1})
+     * @eval queue.tube['%tube_name%']:put('ttr_1', {ttr = 1})
      */
     public function testTimeToRun()
     {
@@ -19,7 +19,7 @@ trait Ttl
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('ttl_1', { ttl = 1})
+     * @eval queue.tube['%tube_name%']:put('ttl_1', {ttl = 1})
      */
     public function testTimeToLive()
     {
@@ -30,8 +30,8 @@ trait Ttl
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('pri_low', { pri = 2})
-     * @eval queue.tube['%tube_name%']:put('pri_high', { pri = 1})
+     * @eval queue.tube['%tube_name%']:put('pri_low', {pri = 2})
+     * @eval queue.tube['%tube_name%']:put('pri_high', {pri = 1})
      */
     public function testPriority()
     {
@@ -46,7 +46,7 @@ trait Ttl
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('delay_1', { delay = 1})
+     * @eval queue.tube['%tube_name%']:put('delay_1', {delay = 1})
      */
     public function testDelay()
     {
@@ -59,5 +59,16 @@ trait Ttl
 
         $this->assertTaskInstance($task);
         $this->assertSame('delay_1', $task->getData());
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('stat_delayed_0', {delay = 9999})
+     * @eval queue.tube['%tube_name%']:put('stat_delayed_1', {delay = 9999})
+     */
+    public function testStatisticsDelayed()
+    {
+        $count = $this->queue->statistics('tasks', 'delayed');
+
+        $this->assertSame(2, $count);
     }
 }

@@ -17,13 +17,13 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideCallData
+     * @dataProvider provideApiMethodData
      */
-    public function testMethod($functionName, array $args, array $tuple, $result)
+    public function testApiMethod($functionName, array $args, array $returnValue, $result)
     {
         $this->client->expects($this->once())->method('call')
             ->with("queue.tube.foo:$functionName", $args)
-            ->will($this->returnValue([$tuple]));
+            ->will($this->returnValue([$returnValue]));
 
         $actualResult = call_user_func_array([$this->queue, $functionName], $args);
 
@@ -32,7 +32,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             : $this->assertSame($result, $actualResult);
     }
 
-    public function provideCallData()
+    public function provideApiMethodData()
     {
         $tuple = [1, 'x', 42];
         $task = Task::createFromTuple($tuple);
@@ -49,6 +49,41 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             ['bury', [1], $tuple, $task],
             ['kick', [5], [5], 5],
             ['delete', [1], $tuple, $task],
+        ];
+    }
+
+    /**
+     * @dataProvider provideStatisticsData
+     */
+    public function testStatistics(array $args, array $returnValue, $result)
+    {
+        $this->client->expects($this->once())->method('call')
+            ->with('queue.statistics')
+            ->will($this->returnValue([$returnValue]));
+
+        $actualResult = call_user_func_array([$this->queue, 'statistics'], $args);
+
+        $this->assertSame($result, $actualResult);
+    }
+
+    public function provideStatisticsData()
+    {
+        $stats = ['tasks' => ['ready' => 1, 'done' => 0], 'calls' => ['put' => 3]];
+
+        return [
+            [[], [$stats], $stats],
+            [['tasks'], [$stats], $stats['tasks']],
+            [['tasks', 'ready'], [$stats], $stats['tasks']['ready']],
+            [['tasks', 'done'], [$stats], $stats['tasks']['done']],
+            [['calls'], [$stats], $stats['calls']],
+            [['calls', 'put'], [$stats], $stats['calls']['put']],
+            [[null], [$stats], null],
+            [[null, null], [$stats], null],
+            [[''], [$stats], null],
+            [['foo'], [$stats], null],
+            [['tasks', 'foo'], [$stats], null],
+            [[null, 'tasks'], [$stats], null],
+            [['tasks', ''], [$stats], null],
         ];
     }
 }
