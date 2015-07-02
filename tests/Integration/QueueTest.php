@@ -76,13 +76,13 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null],
+            [true],
             ['foo'],
             ["\x04\x00\xa0\x00\x00"],
             [42],
             [-42],
             [4.2],
-            [['foo' => 'bar', 'baz']],
-            //[(object) ['foo' => 'bar', 'baz']],
+            [['foo' => 'bar', 'baz' => ['qux' => false, -4.2]]],
         ];
     }
 
