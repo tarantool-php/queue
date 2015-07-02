@@ -77,6 +77,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         return [
             [null],
             ['foo'],
+            ["\x04\x00\xa0\x00\x00"],
             [42],
             [-42],
             [4.2],
@@ -226,6 +227,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideFailureCallbackData
      * @expectedException \Exception
+     * @expectedExceptionMessageRegex ^Query error
      */
     public function testThrowException($methodName, array $args)
     {
