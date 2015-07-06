@@ -6,7 +6,7 @@
 
 [Tarantool](http://tarantool.org/) is a NoSQL database running in a Lua application server. It integrates
 Lua modules, called [LuaRocks](https://luarocks.org/). This package provides PHP bindings for
-[Tarantool Queue LuaRock](https://github.com/tarantool/queue/blob/master/).
+[Tarantool Queue LuaRock](https://github.com/tarantool/queue/).
 
 
 ## Installation
