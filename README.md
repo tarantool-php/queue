@@ -178,7 +178,8 @@ section of the [queue's README](https://github.com/tarantool/queue/blob/master/R
 
 ### Statistics
 
-The `statistics()` method provides access to the statistical information since the creation of a queue:
+The `statistics()` method provides access to the statistical information accumulated
+since a queue was created:
 
 ```php
 $stat = $queue->statistics();
