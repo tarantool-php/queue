@@ -78,13 +78,13 @@ $queue->put(['foo' => ['bar' => ['baz' => null]]]);
 
 ### Tasks
 
-Almost every method of the [Queue API](src/Queue.php) (except for `kick()` and `statistics()`) returns back
-a lightweight [Task](src/Task.php) object containing the following getters:
+Almost every method of the [Queue API](src/Queue.php) (except for `kick()` and `statistics()`)
+returns back a [Task](src/Task.php) object containing the following getters:
 
 ```php
-Task::getId()    // The task id
-Task::getState() // The task state (States::READY, States::TAKEN, States::DONE, States::BURY or States::DELAYED)
-Task::getData()  // The task payload
+Task::getId()
+Task::getState() // States::READY, States::TAKEN, States::DONE, States::BURY or States::DELAYED
+Task::getData()
 ```
 
 And some sugar methods:
@@ -100,10 +100,10 @@ Task::isDelayed()
 
 #### Producer API
 
-As you've already seen, to insert a task into a queue you need to call `put()` method, which accepts two arguments:
-the data you want to process and optional array of task options, which this particular queue supports.
-For example, `fifottl` queue (which we defined earlier in our Lua config file), supports `delay`,
-`ttl`, `ttr`, `pri` and `temporary` options:
+As you've already seen, to insert a task into a queue you need to call `put()` method, which accepts
+two arguments: the data you want to process and optional array of task options, which this particular
+queue supports. For example, `fifottl` queue (which we defined earlier in our Lua config file),
+supports `delay`, `ttl`, `ttr`, `pri` and `temporary` options:
 
 ```php
 $queue->put('foo', ['delay' => 30]);
@@ -205,7 +205,7 @@ The result of this call might look like this:
 ]
 ```
 
-In addition, you can specify a key (or keys) to select only a subset of the resulting array:
+In addition, you can specify a key (or keys) to return only a subset of the array:
 
 ```php
 $calls = $queue->statistics('calls');
