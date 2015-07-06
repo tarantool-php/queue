@@ -144,7 +144,8 @@ Or put back into the queue in case it cannot be executed:
 
 ```php
 $this->queue->release($task->getId());
-// or
+
+// for ttl-like queues you can specify a delay
 $this->queue->release($task->getId(), ['delay' => 30]);
 ```
 

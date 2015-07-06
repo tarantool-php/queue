@@ -11,6 +11,8 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use Tarantool\Queue\States;
+
 trait Ttl
 {
     /**
@@ -59,15 +61,30 @@ trait Ttl
      */
     public function testDelay()
     {
-        $task = $this->queue->take(.1);
-
-        $this->assertNull($task);
+        $task = $this->queue->peek(0);
+        $this->assertTask($task, 0, States::DELAYED, 'delay_1');
 
         sleep(1);
-        $task = $this->queue->take(.1);
 
-        $this->assertTaskInstance($task);
-        $this->assertSame('delay_1', $task->getData());
+        $task = $this->queue->peek(0);
+        $this->assertTask($task, 0, States::READY, 'delay_1');
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('release_0')
+     * @eval queue.tube['%tube_name%']:take()
+     */
+    public function testDelayedRelease()
+    {
+        $this->queue->release(0, ['delay' => 1]);
+
+        $task = $this->queue->peek(0);
+        $this->assertTask($task, 0, States::DELAYED, 'release_0');
+
+        sleep(1);
+
+        $task = $this->queue->peek(0);
+        $this->assertTask($task, 0, States::READY, 'release_0');
     }
 
     /**
