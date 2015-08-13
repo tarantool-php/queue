@@ -41,16 +41,16 @@ before_script:
 
 script:
     - >
-        bash -c 'if [[ 5.6 == $TRAVIS_PHP_VERSION ]]; then
+        if [[ $TRAVIS_PHP_VERSION == 5.6 ]]; then
             phpunit --coverage-clover coverage.clover;
         else
             phpunit;
-        fi;'
+        fi
 
 after_script:
     # code-coverage for scrutinizer-ci
     - >
-        bash -c 'if [[ -f coverage.clover ]]; then
+        if [[ -f coverage.clover ]]; then
             wget https://scrutinizer-ci.com/ocular.phar;
             php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
-        fi;'
+        fi
