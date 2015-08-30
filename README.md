@@ -98,7 +98,7 @@ Task::isDelayed()
 ```
 
 
-#### Producer API
+### Producer API
 
 As you've already seen, to insert a task into a queue you need to call `put()` method, which accepts
 two arguments: the data you want to process and optional array of task options, which this particular
@@ -114,7 +114,7 @@ $queue->put('baz', ['ttr' => 10, 'pri' => 42]);
 > See the full list of available options [here](https://github.com/tarantool/queue#producer-api).
 
 
-#### Consumer API
+### Consumer API
 
 To reserve a task for execution, call `take()` method. It accepts an optional `timeout` parameter.
 If a timeout value is supplied the call will wait `timeout` seconds until a `READY` task appears in the queue.
