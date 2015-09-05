@@ -10,6 +10,9 @@ box.cfg {
 
 box.schema.user.grant('guest', 'read,write,execute', 'universe')
 
+console = require('console')
+console.listen('127.0.0.1:33333')
+
 queue = require('queue')
 queue.start()
 
