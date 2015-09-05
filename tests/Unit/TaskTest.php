@@ -16,14 +16,6 @@ use Tarantool\Queue\Task;
 
 class TaskTest extends \PHPUnit_Framework_TestCase
 {
-    static $isserMap = [
-        States::READY => 'isReady',
-        States::TAKEN => 'isTaken',
-        States::DONE => 'isDone',
-        States::BURIED => 'isBuried',
-        States::DELAYED => 'isDelayed',
-    ];
-
     /**
      * @dataProvider provideTuples
      */
@@ -55,11 +47,19 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsser($state)
     {
+        static $map = [
+            States::READY => 'isReady',
+            States::TAKEN => 'isTaken',
+            States::DONE => 'isDone',
+            States::BURIED => 'isBuried',
+            States::DELAYED => 'isDelayed',
+        ];
+
         $task = Task::createFromTuple([0, $state, null]);
 
-        $this->assertTrue($task->{self::$isserMap[$state]}());
+        $this->assertTrue($task->{$map[$state]}());
 
-        $issers = self::$isserMap;
+        $issers = $map;
         unset($issers[$state]);
 
         foreach ($issers as $isser) {
