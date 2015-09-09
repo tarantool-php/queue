@@ -66,8 +66,8 @@ trait Ttl
 
         sleep(1);
 
-        $task = $this->queue->peek(0);
-        $this->assertTask($task, 0, States::READY, 'delay_1');
+        $task = $this->queue->take(.1);
+        $this->assertTask($task, 0, States::TAKEN, 'delay_1');
     }
 
     /**
@@ -83,8 +83,8 @@ trait Ttl
 
         sleep(1);
 
-        $task = $this->queue->peek(0);
-        $this->assertTask($task, 0, States::READY, 'release_0');
+        $task = $this->queue->take(.1);
+        $this->assertTask($task, 0, States::TAKEN, 'release_0');
     }
 
     /**
