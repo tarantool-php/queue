@@ -17,7 +17,7 @@ queue = require('queue')
 queue.start()
 
 function create_tube(tube_name, tube_type, opts)
-    if nil ~= queue.tube[tube_name] then
+    if queue.tube[tube_name] then
         queue.tube[tube_name]:drop()
     end
 
