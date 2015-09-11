@@ -32,7 +32,7 @@ queue = require('queue')
 queue.start()
 
 local tube_name = 'foobar'
-if nil == queue.tube[tube_name] then
+if not queue.tube[tube_name] then
     queue.create_tube(tube_name, 'fifottl')
 end
 ```
