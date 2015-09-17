@@ -1,56 +1,41 @@
-language: php
+sudo: required
 
-php:
-    - 5.4
-    - 5.5
-    - 5.6
+language: bash
+
+services:
+  - docker
+
+env:
+  - PHP_VERSION=5.4
+  - PHP_VERSION=5.5
+  - PHP_VERSION=5.6
 
 before_install:
-    - curl http://tarantool.org/dist/public.key | sudo apt-key add -
-    - echo "deb http://tarantool.org/dist/master/ubuntu `lsb_release -c -s` main" | sudo tee -a /etc/apt/sources.list.d/tarantool.list
-    - sudo apt-get update
+  # https://github.com/travis-ci/travis-ci/issues/4778
+  # https://github.com/zuazo/kitchen-in-travis-native/issues/1#issuecomment-142230889
+  - sudo iptables -L DOCKER || (echo "DOCKER iptables chain missing"; sudo iptables -N DOCKER)
+
+  # https://github.com/docker/docker/issues/14634
+  # https://github.com/docker/docker/pull/15182
+  - sed -i -r "s/^(FROM\s+php:).*(-cli)$/\1$PHP_VERSION\2/g" Dockerfile
 
 install:
-    - sudo apt-get -y install tarantool luarocks
-
-    # https://github.com/tarantool/tarantool-php/issues/47
-    - git clone https://github.com/tarantool/tarantool-php.git
-    - cd tarantool-php
-    - phpize && ./configure;
-    - make
-    - sudo make install
-    - cd ..
-    - printf "extension = tarantool.so\n" >> ~/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/php.ini
-
-    - mkdir ~/.luarocks
-    - echo "rocks_servers = {[[http://rocks.tarantool.org/]]}" >> ~/.luarocks/config.lua
-    - luarocks install queue --local
-
-    - composer install
+  - docker pull php
+  - docker pull tarantool/tarantool
+  - docker build -t queue .
 
 before_script:
-    - sudo cp ./tests/Integration/instance.lua /etc/tarantool/instances.enabled
-    - sudo tarantoolctl start instance
-    - >
-        for i in `seq 1 10`; do
-            if sudo tarantoolctl status instance; then
-                break;
-            fi;
-            sleep 1;
-        done
+  - if [[ $PHP_VERSION == 5.6 ]]; then COVERAGE="--coverage-clover coverage.clover"; else COVERAGE=""; fi
 
 script:
-    - >
-        if [[ $TRAVIS_PHP_VERSION == 5.6 ]]; then
-            phpunit --coverage-clover coverage.clover;
-        else
-            phpunit;
-        fi
+  - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/instance.lua
+  - docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue bash -c "composer install && TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 phpunit $COVERAGE"
 
 after_script:
-    # code-coverage for scrutinizer-ci
-    - >
-        if [[ -f coverage.clover ]]; then
-            wget https://scrutinizer-ci.com/ocular.phar;
-            php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
-        fi
+  - >
+    if [[ ! -z "$COVERAGE" ]]; then
+      docker run --rm --name queue -v $(pwd):/queue -w /queue queue bash -c "
+        curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
+        php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+      "
+    fi

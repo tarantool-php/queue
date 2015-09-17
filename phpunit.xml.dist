@@ -15,8 +15,8 @@
     <php>
         <ini name="date.timezone" value="UTC" />
 
-        <env name="TNT_HOST" value="127.0.0.1" />
-        <env name="TNT_PORT" value="3301" />
+        <env name="TARANTOOL_HOST" value="127.0.0.1" />
+        <env name="TARANTOOL_PORT" value="3301" />
     </php>
 
     <testsuites>

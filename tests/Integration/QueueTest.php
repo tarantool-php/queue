@@ -28,7 +28,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$client = new \Tarantool(getenv('TNT_HOST'), getenv('TNT_PORT'));
+        self::$client = new \Tarantool(getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
     }
 
     public static function tearDownAfterClass()
