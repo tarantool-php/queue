@@ -226,14 +226,15 @@ $ docker build -t queue .
 Then run Tarantool instance (needed for integration tests):
 
 ```sh
-$ docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/instance.lua
+$ docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool \
+    /queue/tests/Integration/instance.lua
 ```
 
 And then run both unit and integration tests:
 
 ```sh
-$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue bash -c " \
-    composer install && \
+$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue \
+    bash -c "composer install && \
     TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
     phpunit"
 ```
@@ -241,8 +242,8 @@ $ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
 To run only unit or integration tests, add either `--testsuite Unit` or `--testsuite Integration` respectively, e.g.:
 
 ```sh
-$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue bash -c " \
-    composer install && \
+$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue \
+    bash -c "composer install && \
     TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
     phpunit  --testsuite Integration"
 ```
