@@ -20,8 +20,6 @@ before_install:
   - sed -i -r "s/^(FROM\s+php:).*(-cli)$/\1$PHP_VERSION\2/g" Dockerfile
 
 install:
-  - docker pull php
-  - docker pull tarantool/tarantool
   - docker build -t queue .
 
 before_script:
