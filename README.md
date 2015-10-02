@@ -217,26 +217,36 @@ $total = $queue->statistics('tasks', 'total');
 
 ## Tests
 
-To run unit tests:
+The easiest way to run tests is with Docker. First, build an image from [Dockerfile](Dockerfile):
 
 ```sh
-$ phpunit --testsuite Unit
+$ docker build -t queue .
 ```
 
-To run integration tests:
+Then run Tarantool instance (needed for integration tests):
 
 ```sh
-$ phpunit --testsuite Integration
+$ docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/instance.lua
 ```
 
-> Make sure that the [instance.lua](tests/Integration/instance.lua) instance is up and running.
-
-To run all tests:
+And then run both unit and integration tests:
 
 ```sh
-$ phpunit
-
+$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue bash -c " \
+    composer install && \
+    TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
+    phpunit"
 ```
+
+To run only unit or integration tests, add either `--testsuite Unit` or `--testsuite Integration` respectively, e.g.:
+
+```sh
+$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue bash -c " \
+    composer install && \
+    TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
+    phpunit  --testsuite Integration"
+```
+
 
 ## License
 
