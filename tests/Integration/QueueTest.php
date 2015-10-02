@@ -224,6 +224,13 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         ], $stat, '', 0.0, 3, true);
     }
 
+    public function testStatisticsIsEmpty()
+    {
+        $stat = $this->queue->statistics();
+
+        $this->assertNull($stat);
+    }
+
     /**
      * @dataProvider provideFailureCallbackData
      * @expectedException \Exception
