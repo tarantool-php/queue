@@ -245,7 +245,7 @@ To run only unit or integration tests, add either `--testsuite Unit` or `--tests
 $ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue \
     bash -c "composer install && \
     TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
-    phpunit  --testsuite Integration"
+    phpunit --testsuite Integration"
 ```
 
 
