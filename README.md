@@ -233,19 +233,14 @@ $ docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool \
 And then run both unit and integration tests:
 
 ```sh
-$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue \
-    bash -c "composer install && \
-    TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
-    phpunit"
+$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
 ```
 
-To run only unit or integration tests, add either `--testsuite Unit` or `--testsuite Integration` respectively, e.g.:
+To run only unit or integration tests, set the `PHPUNIT_OPTS` environment variable to either `--testsuite Unit`
+or `--testsuite Integration` respectively, e.g.:
 
 ```sh
-$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue \
-    bash -c "composer install && \
-    TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301 \
-    phpunit --testsuite Integration"
+$ PHPUNIT_OPTS='--testsuite Integration' docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
 ```
 
 
