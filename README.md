@@ -217,7 +217,7 @@ $total = $queue->statistics('tasks', 'total');
 
 ## Tests
 
-The easiest way to run tests is with Docker. First, build an image from [Dockerfile](Dockerfile):
+The easiest way to run tests is with Docker. First, build an image using the [dockerfile.sh](dockerfile.sh) generator:
 
 ```sh
 $ docker build -t queue .
@@ -240,7 +240,8 @@ To run only unit or integration tests, set the `PHPUNIT_OPTS` environment variab
 or `--testsuite Integration` respectively, e.g.:
 
 ```sh
-$ PHPUNIT_OPTS='--testsuite Integration' docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
+$ PHPUNIT_OPTS='--testsuite Integration' docker run --rm --name queue --link tarantool \
+    -v $(pwd):/queue -w /queue queue
 ```
 
 
