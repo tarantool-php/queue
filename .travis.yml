@@ -24,9 +24,9 @@ script:
   - docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
 
 after_script:
-  docker run --rm --name queue -v $(pwd):/queue -w /queue queue bash -c "
-    if [[ -f coverage.clover ]]; then
-      curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
-      php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-    fi
-  "
+  - docker run --rm --name queue -v $(pwd):/queue -w /queue queue bash -c "
+      if [[ -f coverage.clover ]]; then
+        curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
+        php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+      fi
+    "
