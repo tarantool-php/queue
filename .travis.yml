@@ -17,7 +17,7 @@ before_install:
   - sudo iptables -L DOCKER || (echo "DOCKER iptables chain missing"; sudo iptables -N DOCKER)
 
 install:
-  - ./dockerfile.sh | docker build -t msgpack -
+  - ./dockerfile.sh | docker build -t queue -
 
 script:
   - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/instance.lua
