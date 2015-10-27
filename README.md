@@ -220,7 +220,7 @@ $total = $queue->statistics('tasks', 'total');
 The easiest way to run tests is with Docker. First, build an image using the [dockerfile.sh](dockerfile.sh) generator:
 
 ```sh
-$ docker build -t queue .
+$ ./dockerfile.sh | docker build -t queue -
 ```
 
 Then run Tarantool instance (needed for integration tests):
