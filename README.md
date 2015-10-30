@@ -240,7 +240,8 @@ To run only integration or unit tests, set the `PHPUNIT_OPTS` environment variab
 to either `--testsuite Integration` or `--testsuite Unit` respectively, e.g.:
 
 ```sh
-$ PHPUNIT_OPTS='--testsuite Unit' docker run --rm --name queue -v $(pwd):/queue -w /queue queue
+$ docker run --rm --name queue -v $(pwd):/queue -w /queue \
+    -e PHPUNIT_OPTS='--testsuite Unit' queue
 ```
 
 
