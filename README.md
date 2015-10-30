@@ -236,12 +236,11 @@ And then run both unit and integration tests:
 $ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
 ```
 
-To run only unit or integration tests, set the `PHPUNIT_OPTS` environment variable to either `--testsuite Unit`
-or `--testsuite Integration` respectively, e.g.:
+To run only integration or unit tests, set the `PHPUNIT_OPTS` environment variable
+to either `--testsuite Integration` or `--testsuite Unit` respectively, e.g.:
 
 ```sh
-$ PHPUNIT_OPTS='--testsuite Integration' docker run --rm --name queue --link tarantool \
-    -v $(pwd):/queue -w /queue queue
+$ PHPUNIT_OPTS='--testsuite Unit' docker run --rm --name queue -v $(pwd):/queue -w /queue queue
 ```
 
 
