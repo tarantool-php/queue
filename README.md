@@ -137,22 +137,22 @@ $data = $task->getData();
 
 // process $data
 
-$this->queue->ack($task->getId());
+$queue->ack($task->getId());
 ```
 
 Or put back into the queue in case it cannot be executed:
 
 ```php
-$this->queue->release($task->getId());
+$queue->release($task->getId());
 
 // for ttl-like queues you can specify a delay
-$this->queue->release($task->getId(), ['delay' => 30]);
+$queue->release($task->getId(), ['delay' => 30]);
 ```
 
 To look at a task without changing its state, use:
 
 ```php
-$task = $this->queue->peek($task->getId());
+$task = $queue->peek($task->getId());
 ```
 
 To bury (disable) a task:
@@ -170,7 +170,7 @@ $count = $queue->kick(3); // kick 3 buried tasks
 A task (in any state) can be deleted permanently with `delete()`:
 
 ```php
-$this->queue->delete($task->getId());
+$queue->delete($task->getId());
 ```
 
 > For a detailed API documentation, please read [API](https://github.com/tarantool/queue#api)
