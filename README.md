@@ -227,7 +227,7 @@ Then run Tarantool instance (needed for integration tests):
 
 ```sh
 $ docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool \
-    /queue/tests/Integration/instance.lua
+    /queue/tests/Integration/queues.lua
 ```
 
 And then run both unit and integration tests:

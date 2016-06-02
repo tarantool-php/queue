@@ -10,16 +10,11 @@ env:
   - PHP_RUNTIME='php:5.5-cli'
   - PHP_RUNTIME='php:5.6-cli' PHPUNIT_OPTS='--coverage-clover=coverage.clover'
 
-before_install:
-  # https://github.com/travis-ci/travis-ci/issues/4778
-  # https://github.com/zuazo/kitchen-in-travis-native/issues/1#issuecomment-142230889
-  - sudo iptables -L DOCKER || (echo "DOCKER iptables chain missing"; sudo iptables -N DOCKER)
-
 install:
   - ./dockerfile.sh | docker build -t queue -
 
 script:
-  - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/instance.lua
+  - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/queues.lua
   - docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue -e PHPUNIT_OPTS="$PHPUNIT_OPTS" queue
 
 after_script:
