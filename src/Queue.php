@@ -137,6 +137,9 @@ class Queue
         if (empty($result[0][0])) {
             return;
         }
+        if (null === $path) {
+            return $result[0][0];
+        }
 
         $result = $result[0][0];
         foreach (explode('.', $path) as $key) {
