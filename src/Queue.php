@@ -126,9 +126,11 @@ class Queue
     }
 
     /**
+     * @param string|null $path
+     *
      * @return array|int|null
      */
-    public function statistics(/* ... */)
+    public function statistics($path = null)
     {
         $result = $this->client->call('queue.statistics', [$this->tubeName]);
 
@@ -137,11 +139,11 @@ class Queue
         }
 
         $result = $result[0][0];
-        foreach (func_get_args() as $arg) {
-            if (!isset($result[$arg])) {
+        foreach (explode('.', $path) as $key) {
+            if (!isset($result[$key])) {
                 return;
             }
-            $result = $result[$arg];
+            $result = $result[$key];
         }
 
         return $result;

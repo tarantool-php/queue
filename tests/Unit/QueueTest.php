@@ -16,7 +16,14 @@ use Tarantool\Queue\Task;
 
 class QueueTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Tarantool|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $client;
+
+    /**
+     * @var Queue
+     */
     private $queue;
 
     protected function setUp()
@@ -64,13 +71,15 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideStatisticsData
      */
-    public function testStatistics(array $args, array $returnValue, $result)
+    public function testStatistics(array $returnValue, $result, $path = null)
     {
         $this->client->expects($this->once())->method('call')
             ->with('queue.statistics')
             ->will($this->returnValue([$returnValue]));
 
-        $actualResult = call_user_func_array([$this->queue, 'statistics'], $args);
+        $actualResult = 3 === func_num_args()
+            ? $this->queue->statistics($path)
+            : $this->queue->statistics();
 
         $this->assertSame($result, $actualResult);
     }
@@ -80,20 +89,18 @@ class QueueTest extends \PHPUnit_Framework_TestCase
         $stats = ['tasks' => ['ready' => 1, 'done' => 0], 'calls' => ['put' => 3]];
 
         return [
-            [[], [$stats], $stats],
-            [['tasks'], [$stats], $stats['tasks']],
-            [['tasks', 'ready'], [$stats], $stats['tasks']['ready']],
-            [['tasks', 'done'], [$stats], $stats['tasks']['done']],
-            [['calls'], [$stats], $stats['calls']],
-            [['calls', 'put'], [$stats], $stats['calls']['put']],
-            [[], [], null],
-            [[null], [$stats], null],
-            [[null, null], [$stats], null],
-            [[''], [$stats], null],
-            [['foo'], [$stats], null],
-            [['tasks', 'foo'], [$stats], null],
-            [[null, 'tasks'], [$stats], null],
-            [['tasks', ''], [$stats], null],
+            [[$stats], $stats],
+            [[$stats], $stats['tasks'], 'tasks'],
+            [[$stats], $stats['tasks']['ready'], 'tasks.ready'],
+            [[$stats], $stats['tasks']['done'], 'tasks.done'],
+            [[$stats], $stats['calls'], 'calls'],
+            [[$stats], $stats['calls']['put'], 'calls.put'],
+            [[], null],
+            [[$stats], null, ''],
+            [[$stats], null, 'foo'],
+            [[$stats], null, 'tasks.foo'],
+            [[$stats], null, '.tasks'],
+            [[$stats], null, 'tasks.'],
         ];
     }
 }
