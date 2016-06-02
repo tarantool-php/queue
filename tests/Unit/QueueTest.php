@@ -75,7 +75,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->expects($this->once())->method('call')
             ->with('queue.statistics')
-            ->will($this->returnValue([$returnValue]));
+            ->willReturn([$returnValue]);
 
         $actualResult = 3 === func_num_args()
             ? $this->queue->statistics($path)
