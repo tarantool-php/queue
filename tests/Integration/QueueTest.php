@@ -228,7 +228,17 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $stat = $this->queue->statistics();
 
-        $this->assertNull($stat);
+        $this->assertSame([
+            'tasks' => [
+                'taken' => 0,
+                'buried' => 0,
+                'ready' => 0,
+                'delayed' => 0,
+                'total' => 0,
+            ],
+            'calls' => [
+            ],
+        ], $stat);
     }
 
     /**
