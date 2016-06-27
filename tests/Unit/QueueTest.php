@@ -26,6 +26,26 @@ class QueueTest extends \PHPUnit_Framework_TestCase
      */
     private $queue;
 
+    private static $stats = [
+        'tasks' => [
+            'taken' => 1,
+            'buried' => 2,
+            'ready' => 3,
+            'done' => 4,
+            'delayed' => 5,
+            'total' => 15,
+        ],
+        'calls' => [
+            'ack' => 1,
+            'delete' => 2,
+            'take' => 3,
+            'kick' => 4,
+            'release' => 5,
+            'put' => 6,
+            'bury' => 7,
+        ],
+    ];
+
     protected function setUp()
     {
         $this->client = $this->getMock('Tarantool', ['call']);
@@ -71,11 +91,11 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideStatisticsData
      */
-    public function testStatistics(array $returnValue, $result, $path = null)
+    public function testStatistics(array $stats, $result, $path = null)
     {
         $this->client->expects($this->once())->method('call')
             ->with('queue.statistics')
-            ->willReturn([$returnValue]);
+            ->willReturn([[$stats]]);
 
         $actualResult = 3 === func_num_args()
             ? $this->queue->statistics($path)
@@ -86,21 +106,52 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
     public function provideStatisticsData()
     {
-        $stats = ['tasks' => ['ready' => 1, 'done' => 0], 'calls' => ['put' => 3]];
-
         return [
-            [[$stats], $stats],
-            [[$stats], $stats['tasks'], 'tasks'],
-            [[$stats], $stats['tasks']['ready'], 'tasks.ready'],
-            [[$stats], $stats['tasks']['done'], 'tasks.done'],
-            [[$stats], $stats['calls'], 'calls'],
-            [[$stats], $stats['calls']['put'], 'calls.put'],
-            [[], null],
-            [[$stats], null, ''],
-            [[$stats], null, 'foo'],
-            [[$stats], null, 'tasks.foo'],
-            [[$stats], null, '.tasks'],
-            [[$stats], null, 'tasks.'],
+            [self::$stats, self::$stats],
+            [self::$stats, self::$stats['tasks'], 'tasks'],
+            [self::$stats, self::$stats['tasks']['taken'], 'tasks.taken'],
+            [self::$stats, self::$stats['tasks']['buried'], 'tasks.buried'],
+            [self::$stats, self::$stats['tasks']['ready'], 'tasks.ready'],
+            [self::$stats, self::$stats['tasks']['done'], 'tasks.done'],
+            [self::$stats, self::$stats['tasks']['delayed'], 'tasks.delayed'],
+            [self::$stats, self::$stats['tasks']['total'], 'tasks.total'],
+            [self::$stats, self::$stats['calls'], 'calls'],
+            [self::$stats, self::$stats['calls']['ack'], 'calls.ack'],
+            [self::$stats, self::$stats['calls']['delete'], 'calls.delete'],
+            [self::$stats, self::$stats['calls']['take'], 'calls.take'],
+            [self::$stats, self::$stats['calls']['kick'], 'calls.kick'],
+            [self::$stats, self::$stats['calls']['release'], 'calls.release'],
+            [self::$stats, self::$stats['calls']['put'], 'calls.put'],
+            [self::$stats, self::$stats['calls']['bury'], 'calls.bury'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideStatisticsInvalidPath
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /^Invalid path ".*?"\.$/
+     */
+    public function testStatisticsInvalidPath($path)
+    {
+        $this->client->expects($this->once())->method('call')
+            ->with('queue.statistics')
+            ->willReturn([[self::$stats]]);
+
+        $this->queue->statistics($path);
+    }
+
+    public function provideStatisticsInvalidPath()
+    {
+        return [
+            [''],
+            ['.'],
+            ['foo'],
+            ['tasks.foo'],
+            ['.tasks'],
+            ['tasks.'],
+            ['calls.foo'],
+            ['.calls'],
+            ['calls.'],
         ];
     }
 }

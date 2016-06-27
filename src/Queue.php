@@ -128,15 +128,14 @@ class Queue
     /**
      * @param string|null $path
      *
-     * @return array|int|null
+     * @return array|int
+     *
+     * @throws \InvalidArgumentException
      */
     public function statistics($path = null)
     {
         $result = $this->client->call('queue.statistics', [$this->tubeName]);
 
-        if (empty($result[0][0])) {
-            return;
-        }
         if (null === $path) {
             return $result[0][0];
         }
@@ -144,7 +143,7 @@ class Queue
         $result = $result[0][0];
         foreach (explode('.', $path) as $key) {
             if (!isset($result[$key])) {
-                return;
+                throw new \InvalidArgumentException(sprintf('Invalid path "%s".', $path));
             }
             $result = $result[$key];
         }
