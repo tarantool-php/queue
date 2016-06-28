@@ -207,7 +207,7 @@ The result of this call might look like this:
 ]
 ```
 
-In addition, you can specify a key (or keys) to return only a subset of the array:
+In addition, you can specify a key to return only a subset of the array:
 
 ```php
 $calls = $queue->statistics('calls');
