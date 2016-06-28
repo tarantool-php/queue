@@ -48,7 +48,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->client = $this->getMock('Tarantool', ['call']);
+        $this->client = $this->getMockBuilder('Tarantool')->setMethods(['call'])->getMock();
         $this->queue = new Queue($this->client, 'foo');
     }
 
