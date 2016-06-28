@@ -14,8 +14,7 @@ install:
   - ./dockerfile.sh | docker build -t queue -
 
 script:
-  - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/queues.lua
-  - docker exec $(docker inspect --format="{{.Id}}" tarantool) bash -c 'apt-get update && apt-get install tarantool-queue'
+  - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool bash -c 'apt-get update && apt-get install tarantool-queue && /queue/tests/Integration/queues.lua'
   - docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue -e PHPUNIT_OPTS="$PHPUNIT_OPTS" queue
 
 after_script:
