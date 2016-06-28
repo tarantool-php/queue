@@ -11,6 +11,7 @@ env:
   - PHP_RUNTIME='php:5.6-cli' PHPUNIT_OPTS='--coverage-clover=coverage.clover'
 
 install:
+  - docker build -t tarantool/tarantool github.com/tarantool/tarantool-docker#:debian
   - ./dockerfile.sh | docker build -t queue -
 
 script:
@@ -18,9 +19,7 @@ script:
   - docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue -e PHPUNIT_OPTS="$PHPUNIT_OPTS" queue
 
 after_script:
-  - docker run --rm --name queue -v $(pwd):/queue -w /queue queue bash -c "
-      if [[ -f coverage.clover ]]; then
-        curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
-        php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
-      fi
-    "
+  - if [[ -f coverage.clover ]]; then
+      curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
+      php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
+    fi

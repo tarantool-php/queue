@@ -126,22 +126,26 @@ class Queue
     }
 
     /**
-     * @return array|int|null
+     * @param string|null $path
+     *
+     * @return array|int
+     *
+     * @throws \InvalidArgumentException
      */
-    public function statistics(/* ... */)
+    public function statistics($path = null)
     {
         $result = $this->client->call('queue.statistics', [$this->tubeName]);
 
-        if (empty($result[0][0])) {
-            return;
+        if (null === $path) {
+            return $result[0][0];
         }
 
         $result = $result[0][0];
-        foreach (func_get_args() as $arg) {
-            if (!isset($result[$arg])) {
-                return;
+        foreach (explode('.', $path) as $key) {
+            if (!isset($result[$key])) {
+                throw new \InvalidArgumentException(sprintf('Invalid path "%s".', $path));
             }
-            $result = $result[$arg];
+            $result = $result[$key];
         }
 
         return $result;

@@ -16,12 +16,39 @@ use Tarantool\Queue\Task;
 
 class QueueTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Tarantool|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $client;
+
+    /**
+     * @var Queue
+     */
     private $queue;
+
+    private static $stats = [
+        'tasks' => [
+            'taken' => 1,
+            'buried' => 2,
+            'ready' => 3,
+            'done' => 4,
+            'delayed' => 5,
+            'total' => 15,
+        ],
+        'calls' => [
+            'ack' => 1,
+            'delete' => 2,
+            'take' => 3,
+            'kick' => 4,
+            'release' => 5,
+            'put' => 6,
+            'bury' => 7,
+        ],
+    ];
 
     protected function setUp()
     {
-        $this->client = $this->getMock('Tarantool');
+        $this->client = $this->getMockBuilder('Tarantool')->setMethods(['call'])->getMock();
         $this->queue = new Queue($this->client, 'foo');
     }
 
@@ -64,36 +91,67 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideStatisticsData
      */
-    public function testStatistics(array $args, array $returnValue, $result)
+    public function testStatistics(array $stats, $result, $path = null)
     {
         $this->client->expects($this->once())->method('call')
             ->with('queue.statistics')
-            ->will($this->returnValue([$returnValue]));
+            ->willReturn([[$stats]]);
 
-        $actualResult = call_user_func_array([$this->queue, 'statistics'], $args);
+        $actualResult = 3 === func_num_args()
+            ? $this->queue->statistics($path)
+            : $this->queue->statistics();
 
         $this->assertSame($result, $actualResult);
     }
 
     public function provideStatisticsData()
     {
-        $stats = ['tasks' => ['ready' => 1, 'done' => 0], 'calls' => ['put' => 3]];
-
         return [
-            [[], [$stats], $stats],
-            [['tasks'], [$stats], $stats['tasks']],
-            [['tasks', 'ready'], [$stats], $stats['tasks']['ready']],
-            [['tasks', 'done'], [$stats], $stats['tasks']['done']],
-            [['calls'], [$stats], $stats['calls']],
-            [['calls', 'put'], [$stats], $stats['calls']['put']],
-            [[], [], null],
-            [[null], [$stats], null],
-            [[null, null], [$stats], null],
-            [[''], [$stats], null],
-            [['foo'], [$stats], null],
-            [['tasks', 'foo'], [$stats], null],
-            [[null, 'tasks'], [$stats], null],
-            [['tasks', ''], [$stats], null],
+            [self::$stats, self::$stats],
+            [self::$stats, self::$stats['tasks'], 'tasks'],
+            [self::$stats, self::$stats['tasks']['taken'], 'tasks.taken'],
+            [self::$stats, self::$stats['tasks']['buried'], 'tasks.buried'],
+            [self::$stats, self::$stats['tasks']['ready'], 'tasks.ready'],
+            [self::$stats, self::$stats['tasks']['done'], 'tasks.done'],
+            [self::$stats, self::$stats['tasks']['delayed'], 'tasks.delayed'],
+            [self::$stats, self::$stats['tasks']['total'], 'tasks.total'],
+            [self::$stats, self::$stats['calls'], 'calls'],
+            [self::$stats, self::$stats['calls']['ack'], 'calls.ack'],
+            [self::$stats, self::$stats['calls']['delete'], 'calls.delete'],
+            [self::$stats, self::$stats['calls']['take'], 'calls.take'],
+            [self::$stats, self::$stats['calls']['kick'], 'calls.kick'],
+            [self::$stats, self::$stats['calls']['release'], 'calls.release'],
+            [self::$stats, self::$stats['calls']['put'], 'calls.put'],
+            [self::$stats, self::$stats['calls']['bury'], 'calls.bury'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideStatisticsInvalidPath
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /^Invalid path ".*?"\.$/
+     */
+    public function testStatisticsInvalidPath($path)
+    {
+        $this->client->expects($this->once())->method('call')
+            ->with('queue.statistics')
+            ->willReturn([[self::$stats]]);
+
+        $this->queue->statistics($path);
+    }
+
+    public function provideStatisticsInvalidPath()
+    {
+        return [
+            [''],
+            ['.'],
+            ['foo'],
+            ['tasks.foo'],
+            ['.tasks'],
+            ['tasks.'],
+            ['calls.foo'],
+            ['.calls'],
+            ['calls.'],
         ];
     }
 }

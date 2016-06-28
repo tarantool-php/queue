@@ -93,7 +93,7 @@ trait Ttl
      */
     public function testStatisticsDelayed()
     {
-        $count = $this->queue->statistics('tasks', 'delayed');
+        $count = $this->queue->statistics('tasks.delayed');
 
         $this->assertSame(2, $count);
     }

@@ -211,7 +211,7 @@ In addition, you can specify a key (or keys) to return only a subset of the arra
 
 ```php
 $calls = $queue->statistics('calls');
-$total = $queue->statistics('tasks', 'total');
+$total = $queue->statistics('tasks.total');
 ```
 
 

@@ -228,15 +228,23 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $stat = $this->queue->statistics();
 
-        $this->assertSame([
+        $this->assertEquals([
             'tasks' => [
                 'taken' => 0,
                 'buried' => 0,
                 'ready' => 0,
+                'done' => 0,
                 'delayed' => 0,
                 'total' => 0,
             ],
             'calls' => [
+                'ack' => 0,
+                'bury' => 0,
+                'delete' => 0,
+                'kick' => 0,
+                'put' => 0,
+                'release' => 0,
+                'take' => 0,
             ],
         ], $stat);
     }
@@ -244,7 +252,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideFailureCallbackData
      * @expectedException \Exception
-     * @expectedExceptionMessageRegex ^Query error
+     * @expectedExceptionMessageRegExp /^Query error/
      */
     public function testThrowException($methodName, array $args)
     {
