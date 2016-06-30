@@ -61,7 +61,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->expects($this->once())->method('call')
             ->with('queue.tube.'.self::QUEUE_NAME.':'.$functionName, $args)
-            ->willReturn($returnValue);
+            ->willReturn([$returnValue]);
 
         $actualResult = call_user_func_array([$this->queue, $functionName], $args);
 
