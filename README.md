@@ -31,10 +31,7 @@ box.cfg {}
 queue = require('queue')
 queue.start()
 
-local tube_name = 'foobar'
-if not queue.tube[tube_name] then
-    queue.create_tube(tube_name, 'fifottl')
-end
+queue.create_tube('foobar', 'fifottl', { if_not_exists=true })
 ```
 
 > You can read more about the box configuration in the official [Tarantool documentation](http://tarantool.org/doc/book/configuration/index.html#initialization-file).
