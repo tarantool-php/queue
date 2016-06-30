@@ -8,7 +8,11 @@ box.cfg {
     slab_alloc_arena = .1,
 }
 
-box.schema.user.grant('guest', 'read,write,execute', 'universe')
+local function bootstrap()
+    box.schema.user.grant('guest', 'read,write,execute', 'universe')
+end
+
+box.once('queues', bootstrap)
 
 console = require('console')
 console.listen('127.0.0.1:33333')
