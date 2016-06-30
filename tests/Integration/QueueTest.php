@@ -138,16 +138,6 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('delete_0')
-     */
-    public function testDelete()
-    {
-        $task = $this->queue->delete(0);
-
-        $this->assertTask($task, 0, States::DONE, 'delete_0');
-    }
-
-    /**
      * @eval queue.tube['%tube_name%']:put('bury_0')
      */
     public function testBury()
@@ -181,6 +171,38 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $count = $this->queue->kick(3);
 
         $this->assertSame(3, $count);
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('delete_0')
+     */
+    public function testDelete()
+    {
+        $task = $this->queue->delete(0);
+
+        $this->assertTask($task, 0, States::DONE, 'delete_0');
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('truncate_0')
+     * @eval queue.tube['%tube_name%']:put('truncate_1')
+     */
+    public function testTruncate()
+    {
+        $this->assertSame(2, $this->queue->statistics('tasks.total'));
+
+        $this->queue->truncate();
+
+        $this->assertSame(0, $this->queue->statistics('tasks.total'));
+    }
+
+    public function testTruncateEmpty()
+    {
+        $this->assertSame(0, $this->queue->statistics('tasks.total'));
+
+        $this->queue->truncate();
+
+        $this->assertSame(0, $this->queue->statistics('tasks.total'));
     }
 
     /**

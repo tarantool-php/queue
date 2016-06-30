@@ -125,6 +125,11 @@ class Queue
         return Task::createFromTuple($result[0]);
     }
 
+    public function truncate()
+    {
+        $this->client->call($this->prefix.'truncate');
+    }
+
     /**
      * @param string|null $path
      *

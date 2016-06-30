@@ -78,8 +78,8 @@ $queue->put(['foo' => ['bar' => ['baz' => null]]]);
 
 ### Tasks
 
-Almost every method of the [Queue API](src/Queue.php) (except for `kick()` and `statistics()`)
-returns back a [Task](src/Task.php) object containing the following getters:
+Most of the [Queue API](src/Queue.php) methonds return back
+a [Task](src/Task.php) object containing the following getters:
 
 ```php
 Task::getId()
@@ -137,16 +137,16 @@ $data = $task->getData();
 
 // process $data
 
-$queue->ack($task->getId());
+$task = $queue->ack($task->getId());
 ```
 
 Or put back into the queue in case it cannot be executed:
 
 ```php
-$queue->release($task->getId());
+$task = $queue->release($task->getId());
 
 // for ttl-like queues you can specify a delay
-$queue->release($task->getId(), ['delay' => 30]);
+$task = $queue->release($task->getId(), ['delay' => 30]);
 ```
 
 To look at a task without changing its state, use:
@@ -158,7 +158,7 @@ $task = $queue->peek($task->getId());
 To bury (disable) a task:
 
 ```php
-$queue->bury($task->getId());
+$task = $queue->bury($task->getId());
 ```
 
 To reset buried task(s) back to `READY` state:
@@ -170,7 +170,13 @@ $count = $queue->kick(3); // kick 3 buried tasks
 A task (in any state) can be deleted permanently with `delete()`:
 
 ```php
-$queue->delete($task->getId());
+$task = $queue->delete($task->getId());
+```
+
+To delete all tasks in a queue:
+
+```php
+$queue->truncate();
 ```
 
 > For a detailed API documentation, please read [API](https://github.com/tarantool/queue#api)

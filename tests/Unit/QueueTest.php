@@ -16,6 +16,8 @@ use Tarantool\Queue\Task;
 
 class QueueTest extends \PHPUnit_Framework_TestCase
 {
+    const QUEUE_NAME = 'foo';
+
     /**
      * @var \Tarantool|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -49,23 +51,23 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->client = $this->getMockBuilder('Tarantool')->setMethods(['call'])->getMock();
-        $this->queue = new Queue($this->client, 'foo');
+        $this->queue = new Queue($this->client, self::QUEUE_NAME);
     }
 
     /**
      * @dataProvider provideApiMethodData
      */
-    public function testApiMethod($functionName, array $args, array $returnValue, $result)
+    public function testApiMethod($functionName, array $args, array $returnValue, $expectedResult)
     {
         $this->client->expects($this->once())->method('call')
-            ->with("queue.tube.foo:$functionName", $args)
-            ->will($this->returnValue([$returnValue]));
+            ->with('queue.tube.'.self::QUEUE_NAME.':'.$functionName, $args)
+            ->willReturn($returnValue);
 
         $actualResult = call_user_func_array([$this->queue, $functionName], $args);
 
-        is_object($result)
-            ? $this->assertEquals($result, $actualResult)
-            : $this->assertSame($result, $actualResult);
+        is_object($expectedResult)
+            ? $this->assertEquals($expectedResult, $actualResult)
+            : $this->assertSame($expectedResult, $actualResult);
     }
 
     public function provideApiMethodData()
@@ -88,10 +90,18 @@ class QueueTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testTruncate()
+    {
+        $this->client->expects($this->once())->method('call')
+            ->with('queue.tube.'.self::QUEUE_NAME.':truncate');
+
+        $this->queue->truncate();
+    }
+
     /**
      * @dataProvider provideStatisticsData
      */
-    public function testStatistics(array $stats, $result, $path = null)
+    public function testStatistics(array $stats, $expectedResult, $path = null)
     {
         $this->client->expects($this->once())->method('call')
             ->with('queue.statistics')
@@ -101,7 +111,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             ? $this->queue->statistics($path)
             : $this->queue->statistics();
 
-        $this->assertSame($result, $actualResult);
+        $this->assertSame($expectedResult, $actualResult);
     }
 
     public function provideStatisticsData()
