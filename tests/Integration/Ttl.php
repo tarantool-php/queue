@@ -91,9 +91,9 @@ trait Ttl
      * @eval queue.tube['%tube_name%']:put('stat_delayed_0', {delay = 9999})
      * @eval queue.tube['%tube_name%']:put('stat_delayed_1', {delay = 9999})
      */
-    public function testStatisticsDelayed()
+    public function testStatsDelayed()
     {
-        $count = $this->queue->statistics('tasks.delayed');
+        $count = $this->queue->stats('tasks.delayed');
 
         $this->assertSame(2, $count);
     }

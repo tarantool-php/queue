@@ -99,22 +99,22 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideStatisticsData
+     * @dataProvider provideStatsData
      */
-    public function testStatistics(array $stats, $expectedResult, $path = null)
+    public function testStats(array $stats, $expectedResult, $path = null)
     {
         $this->client->expects($this->once())->method('call')
-            ->with('queue.statistics')
+            ->with('queue.stats')
             ->willReturn([[$stats]]);
 
         $actualResult = 3 === func_num_args()
-            ? $this->queue->statistics($path)
-            : $this->queue->statistics();
+            ? $this->queue->stats($path)
+            : $this->queue->stats();
 
         $this->assertSame($expectedResult, $actualResult);
     }
 
-    public function provideStatisticsData()
+    public function provideStatsData()
     {
         return [
             [self::$stats, self::$stats],
@@ -137,20 +137,20 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideStatisticsInvalidPath
+     * @dataProvider provideStatsInvalidPath
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessageRegExp /^Invalid path ".*?"\.$/
      */
-    public function testStatisticsInvalidPath($path)
+    public function testStatsInvalidPath($path)
     {
         $this->client->expects($this->once())->method('call')
-            ->with('queue.statistics')
+            ->with('queue.stats')
             ->willReturn([[self::$stats]]);
 
-        $this->queue->statistics($path);
+        $this->queue->stats($path);
     }
 
-    public function provideStatisticsInvalidPath()
+    public function provideStatsInvalidPath()
     {
         return [
             [''],

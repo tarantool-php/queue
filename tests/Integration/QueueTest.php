@@ -189,20 +189,20 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
      */
     public function testTruncate()
     {
-        $this->assertSame(2, $this->queue->statistics('tasks.total'));
+        $this->assertSame(2, $this->queue->stats('tasks.total'));
 
         $this->queue->truncate();
 
-        $this->assertSame(0, $this->queue->statistics('tasks.total'));
+        $this->assertSame(0, $this->queue->stats('tasks.total'));
     }
 
     public function testTruncateEmpty()
     {
-        $this->assertSame(0, $this->queue->statistics('tasks.total'));
+        $this->assertSame(0, $this->queue->stats('tasks.total'));
 
         $this->queue->truncate();
 
-        $this->assertSame(0, $this->queue->statistics('tasks.total'));
+        $this->assertSame(0, $this->queue->stats('tasks.total'));
     }
 
     /**
@@ -221,9 +221,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
      * @eval queue.tube['%tube_name%']:kick(1)
      * @eval queue.tube['%tube_name%']:take(.001)
      */
-    public function testStatistics()
+    public function testStats()
     {
-        $stat = $this->queue->statistics();
+        $stats = $this->queue->stats();
 
         $this->assertEquals([
             'tasks' => [
@@ -243,12 +243,12 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'put' => 5,
                 'bury' => 2,
             ],
-        ], $stat, '', 0.0, 3, true);
+        ], $stats, '', 0.0, 3, true);
     }
 
-    public function testStatisticsIsEmpty()
+    public function testEmptyStats()
     {
-        $stat = $this->queue->statistics();
+        $stats = $this->queue->stats();
 
         $this->assertEquals([
             'tasks' => [
@@ -268,7 +268,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'release' => 0,
                 'take' => 0,
             ],
-        ], $stat);
+        ], $stats);
     }
 
     /**

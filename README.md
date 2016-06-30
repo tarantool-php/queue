@@ -185,11 +185,11 @@ section of the [queue's README](https://github.com/tarantool/queue/blob/master/R
 
 ### Statistics
 
-The `statistics()` method provides access to the statistical information accumulated
+The `stats()` method provides access to the statistical information accumulated
 since a queue was created:
 
 ```php
-$stat = $queue->statistics();
+$stats = $queue->stats();
 ```
 
 The result of this call might look like this:
@@ -216,8 +216,8 @@ The result of this call might look like this:
 In addition, you can specify a key to return only a subset of the array:
 
 ```php
-$calls = $queue->statistics('calls');
-$total = $queue->statistics('tasks.total');
+$calls = $queue->stats('calls');
+$total = $queue->stats('tasks.total');
 ```
 
 

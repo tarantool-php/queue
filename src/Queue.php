@@ -137,9 +137,9 @@ class Queue
      *
      * @throws \InvalidArgumentException
      */
-    public function statistics($path = null)
+    public function stats($path = null)
     {
-        $result = $this->client->call('queue.statistics', [$this->tubeName]);
+        $result = $this->client->call('queue.stats', [$this->tubeName]);
 
         if (null === $path) {
             return $result[0][0];
