@@ -7,8 +7,9 @@ fi
 RUN_CMDS=''
 
 if [[ $PHP_RUNTIME == php* ]]; then
+    RUN_CMDS="$RUN_CMDS && \\\\\n    docker-php-ext-install zip"
     RUN_CMDS="$RUN_CMDS && \\\\\n    git clone https://github.com/tarantool/tarantool-php.git /usr/src/php/ext/tarantool"
-    RUN_CMDS="$RUN_CMDS && \\\\\n    echo tarantool >> /usr/src/php-available-exts && docker-php-ext-install zip tarantool"
+    RUN_CMDS="$RUN_CMDS && \\\\\n    echo tarantool >> /usr/src/php-available-exts && docker-php-ext-install tarantool"
 fi
 
 if [[ $PHPUNIT_OPTS =~ (^|[[:space:]])--coverage-[[:alpha:]] ]]; then
