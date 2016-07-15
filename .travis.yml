@@ -12,7 +12,7 @@ env:
 
 install:
   - docker build -t tarantool/tarantool github.com/tarantool/tarantool-docker#:debian
-  - ./dockerfile.sh | docker build -t queue -
+  - ./dockerfile.sh | tee /dev/tty | docker build -t queue -
 
 script:
   - docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool /queue/tests/Integration/queues.lua
