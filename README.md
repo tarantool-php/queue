@@ -51,9 +51,10 @@ Once you have your instance running, you can start by creating a queue object wi
 in the Lua script:
 
 ```php
+use Tarantool\Queue\PeclHandler;
 use Tarantool\Queue\Queue;
 
-$tarantool = new Tarantool();
+$handler = new PeclHandler(new Tarantool());
 $queue = new Queue($tarantool, 'foobar');
 ```
 
