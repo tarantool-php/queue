@@ -19,9 +19,9 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     const QUEUE_NAME = 'foo';
 
     /**
-     * @var \Tarantool|\PHPUnit_Framework_MockObject_MockObject
+     * @var callable|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $client;
+    private $handler;
 
     /**
      * @var Queue
@@ -50,8 +50,8 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->client = $this->getMockBuilder('Tarantool')->setMethods(['call'])->getMock();
-        $this->queue = new Queue($this->client, self::QUEUE_NAME);
+        $this->handler = $this->getMockBuilder(NullHandler::class)->getMock();
+        $this->queue = new Queue($this->handler, self::QUEUE_NAME);
     }
 
     /**
@@ -59,7 +59,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
      */
     public function testApiMethod($functionName, array $args, array $returnValue, $expectedResult)
     {
-        $this->client->expects($this->once())->method('call')
+        $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.tube.'.self::QUEUE_NAME.':'.$functionName, $args)
             ->willReturn([$returnValue]);
 
@@ -103,7 +103,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
      */
     public function testStats(array $stats, $expectedResult, $path = null)
     {
-        $this->client->expects($this->once())->method('call')
+        $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.stats')
             ->willReturn([[$stats]]);
 
@@ -143,7 +143,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
      */
     public function testStatsInvalidPath($path)
     {
-        $this->client->expects($this->once())->method('call')
+        $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.stats')
             ->willReturn([[self::$stats]]);
 

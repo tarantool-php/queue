@@ -11,6 +11,7 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use Tarantool\Queue\PeclHandler;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
@@ -54,7 +55,8 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->queue = new Queue(self::$client, $tubeName);
+        $handler = new PeclHandler(self::$client);
+        $this->queue = new Queue($handler, $tubeName);
     }
 
     protected function tearDown()

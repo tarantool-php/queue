@@ -13,13 +13,13 @@ namespace Tarantool\Queue;
 
 class Queue
 {
-    private $client;
+    private $handler;
     private $tubeName;
     private $prefix;
 
-    public function __construct(\Tarantool $client, $tubeName)
+    public function __construct(callable $handler, $tubeName)
     {
-        $this->client = $client;
+        $this->handler = $handler;
         $this->tubeName = $tubeName;
         $this->prefix = "queue.tube.$tubeName:";
     }
@@ -33,9 +33,10 @@ class Queue
     public function put($data, array $options = null)
     {
         $args = $options ? [$data, $options] : [$data];
-        $result = $this->client->call($this->prefix.'put', $args);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'put', $args);
 
-        return Task::createFromTuple($result[0]);
+        return Task::createFromTuple($result);
     }
 
     /**
@@ -46,9 +47,10 @@ class Queue
     public function take($timeout = null)
     {
         $args = null === $timeout ? [] : [$timeout];
-        $result = $this->client->call($this->prefix.'take', $args);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'take', $args);
 
-        return empty($result[0]) ? null : Task::createFromTuple($result[0]);
+        return empty($result) ? null : Task::createFromTuple($result);
     }
 
     /**
@@ -58,9 +60,10 @@ class Queue
      */
     public function ack($taskId)
     {
-        $result = $this->client->call($this->prefix.'ack', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'ack', [$taskId]);
 
-        return Task::createFromTuple($result[0]);
+        return Task::createFromTuple($result);
     }
 
     /**
@@ -72,9 +75,10 @@ class Queue
     public function release($taskId, array $options = null)
     {
         $args = $options ? [$taskId, $options] : [$taskId];
-        $result = $this->client->call($this->prefix.'release', $args);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'release', $args);
 
-        return Task::createFromTuple($result[0]);
+        return Task::createFromTuple($result);
     }
 
     /**
@@ -84,9 +88,10 @@ class Queue
      */
     public function peek($taskId)
     {
-        $result = $this->client->call($this->prefix.'peek', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'peek', [$taskId]);
 
-        return Task::createFromTuple($result[0]);
+        return Task::createFromTuple($result);
     }
 
     /**
@@ -96,9 +101,10 @@ class Queue
      */
     public function bury($taskId)
     {
-        $result = $this->client->call($this->prefix.'bury', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'bury', [$taskId]);
 
-        return Task::createFromTuple($result[0]);
+        return Task::createFromTuple($result);
     }
 
     /**
@@ -108,9 +114,10 @@ class Queue
      */
     public function kick($count)
     {
-        $result = $this->client->call($this->prefix.'kick', [$count]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'kick', [$count]);
 
-        return $result[0][0];
+        return $result[0];
     }
 
     /**
@@ -120,14 +127,16 @@ class Queue
      */
     public function delete($taskId)
     {
-        $result = $this->client->call($this->prefix.'delete', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'delete', [$taskId]);
 
-        return Task::createFromTuple($result[0]);
+        return Task::createFromTuple($result);
     }
 
     public function truncate()
     {
-        $this->client->call($this->prefix.'truncate');
+        $handler = $this->handler;
+        $handler($this->prefix.'truncate');
     }
 
     /**
@@ -139,13 +148,14 @@ class Queue
      */
     public function stats($path = null)
     {
-        $result = $this->client->call('queue.stats', [$this->tubeName]);
+        $handler = $this->handler;
+        $result = $handler('queue.stats', [$this->tubeName]);
 
         if (null === $path) {
-            return $result[0][0];
+            return $result[0];
         }
 
-        $result = $result[0][0];
+        $result = $result[0];
         foreach (explode('.', $path) as $key) {
             if (!isset($result[$key])) {
                 throw new \InvalidArgumentException(sprintf('Invalid path "%s".', $path));

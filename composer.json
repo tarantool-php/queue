@@ -11,8 +11,15 @@
         }
     ],
     "require": {
-        "php": "^5.4|^7.0",
-        "ext-tarantool": "*"
+        "php": "^5.6|^7.0"
+    },
+    "require-dev": {
+        "ext-tarantool": "dev-master",
+        "tarantool/client": "dev-master"
+    },
+    "suggest": {
+        "ext-tarantool": "For using pecl connector.",
+        "tarantool/client": "For using pure client."
     },
     "autoload": {
         "psr-4": {
@@ -22,11 +29,6 @@
     "autoload-dev" : {
         "psr-4": {
             "Tarantool\\Queue\\Tests\\": "tests/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
         }
     }
 }
