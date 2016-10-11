@@ -61,7 +61,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.tube.'.self::QUEUE_NAME.':'.$functionName, $args)
-            ->willReturn([$returnValue]);
+            ->willReturn($returnValue);
 
         $actualResult = call_user_func_array([$this->queue, $functionName], $args);
 
@@ -92,7 +92,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
     public function testTruncate()
     {
-        $this->client->expects($this->once())->method('call')
+        $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.tube.'.self::QUEUE_NAME.':truncate');
 
         $this->queue->truncate();
@@ -105,7 +105,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.stats')
-            ->willReturn([[$stats]]);
+            ->willReturn([$stats]);
 
         $actualResult = 3 === func_num_args()
             ? $this->queue->stats($path)
@@ -145,7 +145,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler->expects($this->once())->method('__invoke')
             ->with('queue.stats')
-            ->willReturn([[self::$stats]]);
+            ->willReturn([self::$stats]);
 
         $this->queue->stats($path);
     }
