@@ -33,7 +33,8 @@ class Queue
     public function put($data, array $options = null)
     {
         $args = $options ? [$data, $options] : [$data];
-        $result = ($this->handler)($this->prefix.'put', $args);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'put', $args);
 
         return Task::createFromTuple($result);
     }
@@ -46,7 +47,8 @@ class Queue
     public function take($timeout = null)
     {
         $args = null === $timeout ? [] : [$timeout];
-        $result = ($this->handler)($this->prefix.'take', $args);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'take', $args);
 
         return empty($result) ? null : Task::createFromTuple($result);
     }
@@ -58,7 +60,8 @@ class Queue
      */
     public function ack($taskId)
     {
-        $result = ($this->handler)($this->prefix.'ack', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'ack', [$taskId]);
 
         return Task::createFromTuple($result);
     }
@@ -72,7 +75,8 @@ class Queue
     public function release($taskId, array $options = null)
     {
         $args = $options ? [$taskId, $options] : [$taskId];
-        $result = ($this->handler)($this->prefix.'release', $args);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'release', $args);
 
         return Task::createFromTuple($result);
     }
@@ -84,7 +88,8 @@ class Queue
      */
     public function peek($taskId)
     {
-        $result = ($this->handler)($this->prefix.'peek', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'peek', [$taskId]);
 
         return Task::createFromTuple($result);
     }
@@ -96,7 +101,8 @@ class Queue
      */
     public function bury($taskId)
     {
-        $result = ($this->handler)($this->prefix.'bury', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'bury', [$taskId]);
 
         return Task::createFromTuple($result);
     }
@@ -108,7 +114,8 @@ class Queue
      */
     public function kick($count)
     {
-        $result = ($this->handler)($this->prefix.'kick', [$count]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'kick', [$count]);
 
         return $result[0];
     }
@@ -120,14 +127,16 @@ class Queue
      */
     public function delete($taskId)
     {
-        $result = ($this->handler)($this->prefix.'delete', [$taskId]);
+        $handler = $this->handler;
+        $result = $handler($this->prefix.'delete', [$taskId]);
 
         return Task::createFromTuple($result);
     }
 
     public function truncate()
     {
-        ($this->handler)($this->prefix.'truncate');
+        $handler = $this->handler;
+        $handler($this->prefix.'truncate');
     }
 
     /**
@@ -139,7 +148,8 @@ class Queue
      */
     public function stats($path = null)
     {
-        $result = ($this->handler)('queue.stats', [$this->tubeName]);
+        $handler = $this->handler;
+        $result = $handler('queue.stats', [$this->tubeName]);
 
         if (null === $path) {
             return $result[0];
