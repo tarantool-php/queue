@@ -50,7 +50,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->handler = $this->getMockBuilder(NullHandler::class)->getMock();
+        $this->handler = $this->getMockBuilder('Tarantool\Queue\Tests\Unit\NullHandler')->getMock();
         $this->queue = new Queue($this->handler, self::QUEUE_NAME);
     }
 
