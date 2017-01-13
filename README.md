@@ -75,7 +75,7 @@ $queue->put(['foo' => ['bar' => ['baz' => null]]]);
 
 ### Tasks
 
-Most of the [Queue API](src/Queue.php) methonds return back
+Most of the [Queue API](src/Queue.php) methods return back
 a [Task](src/Task.php) object containing the following getters:
 
 ```php
