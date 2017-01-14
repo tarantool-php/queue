@@ -108,7 +108,7 @@ $queue->put('bar', ['ttl' => 5]);
 $queue->put('baz', ['ttr' => 10, 'pri' => 42]);
 ```
 
-> See the full list of available options [here](https://github.com/tarantool/queue#producer-api).
+> See the full list of available options [here](https://github.com/tarantool/queue#queue-types).
 
 
 ### Consumer API
@@ -176,8 +176,9 @@ To delete all tasks in a queue:
 $queue->truncate();
 ```
 
-> For a detailed API documentation, please read [API](https://github.com/tarantool/queue#api)
-section of the [queue's README](https://github.com/tarantool/queue/blob/master/README.md).
+> For a detailed API documentation, please read the section 
+"[Using the queue module](https://github.com/tarantool/queue#using-the-queue-module)" 
+of the [queue's README](https://github.com/tarantool/queue/blob/master/README.md).
 
 
 ### Statistics
