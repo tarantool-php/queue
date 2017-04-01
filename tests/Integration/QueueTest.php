@@ -43,9 +43,8 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
         $uri = sprintf('tcp://%s:%s', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
         $conn = new StreamConnection($uri);
-        $client = new Client($conn, new PurePacker());
 
-        self::$client = new ClientAdapter($client);
+        self::$client = new Client($conn, new PurePacker());
     }
 
     public static function tearDownAfterClass()
