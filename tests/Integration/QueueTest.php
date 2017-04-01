@@ -291,7 +291,6 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideFailureCallbackData
      * @expectedException \Exception
-     * @expectedExceptionMessageRegExp /^Query error/
      */
     public function testThrowException($methodName, array $args)
     {

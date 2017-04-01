@@ -26,6 +26,6 @@ class ClientAdapter
     {
         $result = $this->client->call($funcName, $args);
 
-        return 'queue.stats' === $funcName ? [$result->getData()] : $result->getData();
+        return isset($result->getData()[0][0]) ? $result->getData() : [$result->getData()];
     }
 }
