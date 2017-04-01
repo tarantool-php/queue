@@ -240,6 +240,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'take' => 3,
                 'kick' => 1,
                 'release' => 1,
+                'touch' => 0,
                 'put' => 5,
                 'bury' => 2,
             ],
@@ -267,6 +268,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'put' => 0,
                 'release' => 0,
                 'take' => 0,
+                'touch' => 0,
             ],
         ], $stats);
     }
