@@ -17,7 +17,7 @@ if [[ $IMAGE == php* ]]; then
         RUN_POST_CMDS="$RUN_POST_CMDS && \\\\\n    composer require tarantool/client:@dev"
     else
         RUN_CMDS="$RUN_CMDS && \\\\\n    git clone https://github.com/tarantool/tarantool-php.git /usr/src/php/ext/tarantool"
-        if [[ $IMAGE == php:7* ]]; then RUN_CMDS="$RUN_CMDS && \\\\\n    git checkout php7-v2"; fi
+        if [[ $IMAGE == php:7* ]]; then RUN_CMDS="$RUN_CMDS && \\\\\n    git --git-dir=/usr/src/php/ext/tarantool/.git --work-tree=/usr/src/php/ext/tarantool checkout php7-v2"; fi
         RUN_CMDS="$RUN_CMDS && \\\\\n    echo tarantool >> /usr/src/php-available-exts && docker-php-ext-install tarantool"
     fi
 fi
