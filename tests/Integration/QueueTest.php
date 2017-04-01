@@ -14,7 +14,6 @@ namespace Tarantool\Queue\Tests\Integration;
 use Tarantool\Client\Client;
 use Tarantool\Client\Connection\StreamConnection;
 use Tarantool\Client\Packer\PurePacker;
-use Tarantool\Queue\ClientAdapter;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
@@ -32,7 +31,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        if (class_exists('Tarantool')) {
+        if (class_exists('Tarantool', false)) {
             self::$client = new \Tarantool(
                 getenv('TARANTOOL_HOST'),
                 getenv('TARANTOOL_PORT')
