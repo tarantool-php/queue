@@ -35,7 +35,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             'ready' => 3,
             'done' => 4,
             'delayed' => 5,
-            'total' => 15,
+            'total' => 11,
         ],
         'calls' => [
             'ack' => 1,
@@ -55,15 +55,43 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provideConstructorInvalidArgumentData
+     */
+    public function testConstructorThrowsInvalidArgumentException($invalidClient, $type)
+    {
+        try {
+            new Queue($invalidClient, 'foobar');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e);
+            $this->assertSame(
+                "Tarantool\\Queue\\Queue::__construct() expects parameter 1 to be Tarantool or Tarantool\\Client\\Client, $type given.",
+                $e->getMessage()
+            );
+
+            return;
+        }
+
+        $this->fail();
+    }
+
+    public function provideConstructorInvalidArgumentData()
+    {
+        return [
+            [new \stdClass(), 'stdClass'],
+            [[], 'array'],
+        ];
+    }
+
+    /**
      * @dataProvider provideApiMethodData
      */
-    public function testApiMethod($functionName, array $args, array $returnValue, $expectedResult)
+    public function testApiMethod($funcName, array $args, array $returnValue, $expectedResult)
     {
         $this->client->expects($this->once())->method('call')
-            ->with('queue.tube.'.self::QUEUE_NAME.':'.$functionName, $args)
+            ->with('queue.tube.'.self::QUEUE_NAME.':'.$funcName, $args)
             ->willReturn([$returnValue]);
 
-        $actualResult = call_user_func_array([$this->queue, $functionName], $args);
+        $actualResult = call_user_func_array([$this->queue, $funcName], $args);
 
         is_object($expectedResult)
             ? $this->assertEquals($expectedResult, $actualResult)

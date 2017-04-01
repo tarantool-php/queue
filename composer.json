@@ -11,11 +11,15 @@
         }
     ],
     "require": {
-        "php": "^5.4|^7.0",
-        "ext-tarantool": "*"
+        "php": "^5.4|^7.0"
     },
     "require-dev": {
-        "tarantool/client": "^0.3"
+        "rybakit/msgpack": "@dev",
+        "tarantool/client": "@dev"
+    },
+    "suggest": {
+        "ext-tarantool": "For using pecl extension",
+        "tarantool/client": "For using pure client"
     },
     "autoload": {
         "psr-4": {
@@ -25,11 +29,6 @@
     "autoload-dev" : {
         "psr-4": {
             "Tarantool\\Queue\\Tests\\": "tests/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
         }
     }
 }

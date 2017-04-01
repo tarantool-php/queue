@@ -11,29 +11,44 @@
 
 namespace Tarantool\Queue;
 
+use Tarantool\Client\Client;
+
 class Queue
 {
     private $client;
     private $tubeName;
-    private $prefix;
 
-    public function __construct(\Tarantool $client, $tubeName)
+    /**
+     * @param \Tarantool|\Tarantool\Client\Client $client
+     * @param string $tubeName
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($client, $tubeName)
     {
+        if ($client instanceof Client) {
+            $client = new ClientAdapter($client);
+        } else if (!$client instanceof \Tarantool) {
+            throw new \InvalidArgumentException(sprintf(
+                '%s() expects parameter 1 to be Tarantool or Tarantool\Client\Client, %s given.',
+                __METHOD__, is_object($client) ? get_class($client) : gettype($client)
+            ));
+        }
+
         $this->client = $client;
         $this->tubeName = $tubeName;
-        $this->prefix = "queue.tube.$tubeName:";
     }
 
     /**
-     * @param mixed      $data
-     * @param array|null $options
+     * @param mixed $data
+     * @param array $options
      *
      * @return Task
      */
-    public function put($data, array $options = null)
+    public function put($data, array $options = [])
     {
         $args = $options ? [$data, $options] : [$data];
-        $result = $this->client->call($this->prefix.'put', $args);
+        $result = $this->client->call("queue.tube.$this->tubeName:put", $args);
 
         return Task::createFromTuple($result[0]);
     }
@@ -46,7 +61,7 @@ class Queue
     public function take($timeout = null)
     {
         $args = null === $timeout ? [] : [$timeout];
-        $result = $this->client->call($this->prefix.'take', $args);
+        $result = $this->client->call("queue.tube.$this->tubeName:take", $args);
 
         return empty($result[0]) ? null : Task::createFromTuple($result[0]);
     }
@@ -58,21 +73,21 @@ class Queue
      */
     public function ack($taskId)
     {
-        $result = $this->client->call($this->prefix.'ack', [$taskId]);
+        $result = $this->client->call("queue.tube.$this->tubeName:ack", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
 
     /**
-     * @param int        $taskId
-     * @param array|null $options
+     * @param int $taskId
+     * @param array $options
      *
      * @return Task
      */
-    public function release($taskId, array $options = null)
+    public function release($taskId, array $options = [])
     {
         $args = $options ? [$taskId, $options] : [$taskId];
-        $result = $this->client->call($this->prefix.'release', $args);
+        $result = $this->client->call("queue.tube.$this->tubeName:release", $args);
 
         return Task::createFromTuple($result[0]);
     }
@@ -84,7 +99,7 @@ class Queue
      */
     public function peek($taskId)
     {
-        $result = $this->client->call($this->prefix.'peek', [$taskId]);
+        $result = $this->client->call("queue.tube.$this->tubeName:peek", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
@@ -96,7 +111,7 @@ class Queue
      */
     public function bury($taskId)
     {
-        $result = $this->client->call($this->prefix.'bury', [$taskId]);
+        $result = $this->client->call("queue.tube.$this->tubeName:bury", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
@@ -108,7 +123,7 @@ class Queue
      */
     public function kick($count)
     {
-        $result = $this->client->call($this->prefix.'kick', [$count]);
+        $result = $this->client->call("queue.tube.$this->tubeName:kick", [$count]);
 
         return $result[0][0];
     }
@@ -120,14 +135,14 @@ class Queue
      */
     public function delete($taskId)
     {
-        $result = $this->client->call($this->prefix.'delete', [$taskId]);
+        $result = $this->client->call("queue.tube.$this->tubeName:delete", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
 
     public function truncate()
     {
-        $this->client->call($this->prefix.'truncate');
+        $this->client->call("queue.tube.$this->tubeName:truncate");
     }
 
     /**

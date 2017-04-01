@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Tarantool\Queue;
+
 use Tarantool\Client\Client;
 
-class Tarantool
+class ClientAdapter
 {
     private $client;
 
@@ -20,15 +22,10 @@ class Tarantool
         $this->client = $client;
     }
 
-    public function call($functionName, array $args = [])
+    public function call($funcName, array $args = [])
     {
-        $result = $this->client->call($functionName, $args);
+        $result = $this->client->call($funcName, $args);
 
-        return $result->getData();
-    }
-
-    public function disconnect()
-    {
-        $this->client->getConnection()->close();
+        return 'queue.stats' === $funcName ? [$result->getData()] : $result->getData();
     }
 }

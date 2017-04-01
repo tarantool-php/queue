@@ -11,6 +11,10 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use Tarantool\Client\Client;
+use Tarantool\Client\Connection\StreamConnection;
+use Tarantool\Client\Packer\PurePacker;
+use Tarantool\Queue\ClientAdapter;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
@@ -22,18 +26,30 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     protected $queue;
 
     /**
-     * @var \Tarantool
+     * @var \Tarantool|\Tarantool\Client\Client
      */
     private static $client;
 
     public static function setUpBeforeClass()
     {
-        self::$client = new \Tarantool(getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
+        if (class_exists('Tarantool')) {
+            self::$client = new \Tarantool(
+                getenv('TARANTOOL_HOST'),
+                getenv('TARANTOOL_PORT')
+            );
+
+            return;
+        }
+
+        $uri = sprintf('tcp://%s:%s', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
+        $conn = new StreamConnection($uri);
+        $client = new Client($conn, new PurePacker());
+
+        self::$client = new ClientAdapter($client);
     }
 
     public static function tearDownAfterClass()
     {
-        self::$client->disconnect();
         self::$client = null;
     }
 
