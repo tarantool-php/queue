@@ -65,8 +65,8 @@ or an instance of `Tarantool\Client\Client` from the [pure PHP package](https://
 ### Data types
 
 Under the hood Tarantool uses [MessagePack](http://msgpack.org/) binary format to serialize/deserialize
-data being stored in a queue. This means that it's safe to use such data types as `null`, `bool`, `int`,
-`float`, `string`, `binary string` and `array` without any manual pre- or post-processing:
+data being stored in a queue. It can handle most of the PHP data types (except resources and closures) without 
+any manual pre- or post-processing:
 
 ```php
 $queue->put('foo');
@@ -74,7 +74,12 @@ $queue->put(true);
 $queue->put(42);
 $queue->put(4.2);
 $queue->put(['foo' => ['bar' => ['baz' => null]]]);
+$queue->put(new MyObject());
 ```
+
+> *Note*
+>
+> Object serialization is only supported when [tarantool/client](https://github.com/tarantool-php/client) is used.
 
 
 ### Tasks
