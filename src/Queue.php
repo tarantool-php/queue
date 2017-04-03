@@ -16,15 +16,15 @@ use Tarantool\Client\Client;
 class Queue
 {
     private $client;
-    private $tubeName;
+    private $name;
 
     /**
      * @param \Tarantool|\Tarantool\Client\Client $client
-     * @param string $tubeName
+     * @param string $name
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($client, $tubeName)
+    public function __construct($client, $name)
     {
         if ($client instanceof Client) {
             $client = new ClientAdapter($client);
@@ -36,7 +36,15 @@ class Queue
         }
 
         $this->client = $client;
-        $this->tubeName = $tubeName;
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -48,7 +56,7 @@ class Queue
     public function put($data, array $options = [])
     {
         $args = $options ? [$data, $options] : [$data];
-        $result = $this->client->call("queue.tube.$this->tubeName:put", $args);
+        $result = $this->client->call("queue.tube.$this->name:put", $args);
 
         return Task::createFromTuple($result[0]);
     }
@@ -61,7 +69,7 @@ class Queue
     public function take($timeout = null)
     {
         $args = null === $timeout ? [] : [$timeout];
-        $result = $this->client->call("queue.tube.$this->tubeName:take", $args);
+        $result = $this->client->call("queue.tube.$this->name:take", $args);
 
         return empty($result[0]) ? null : Task::createFromTuple($result[0]);
     }
@@ -73,7 +81,7 @@ class Queue
      */
     public function ack($taskId)
     {
-        $result = $this->client->call("queue.tube.$this->tubeName:ack", [$taskId]);
+        $result = $this->client->call("queue.tube.$this->name:ack", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
@@ -87,7 +95,7 @@ class Queue
     public function release($taskId, array $options = [])
     {
         $args = $options ? [$taskId, $options] : [$taskId];
-        $result = $this->client->call("queue.tube.$this->tubeName:release", $args);
+        $result = $this->client->call("queue.tube.$this->name:release", $args);
 
         return Task::createFromTuple($result[0]);
     }
@@ -99,7 +107,7 @@ class Queue
      */
     public function peek($taskId)
     {
-        $result = $this->client->call("queue.tube.$this->tubeName:peek", [$taskId]);
+        $result = $this->client->call("queue.tube.$this->name:peek", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
@@ -111,7 +119,7 @@ class Queue
      */
     public function bury($taskId)
     {
-        $result = $this->client->call("queue.tube.$this->tubeName:bury", [$taskId]);
+        $result = $this->client->call("queue.tube.$this->name:bury", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
@@ -123,7 +131,7 @@ class Queue
      */
     public function kick($count)
     {
-        $result = $this->client->call("queue.tube.$this->tubeName:kick", [$count]);
+        $result = $this->client->call("queue.tube.$this->name:kick", [$count]);
 
         return $result[0][0];
     }
@@ -135,14 +143,14 @@ class Queue
      */
     public function delete($taskId)
     {
-        $result = $this->client->call("queue.tube.$this->tubeName:delete", [$taskId]);
+        $result = $this->client->call("queue.tube.$this->name:delete", [$taskId]);
 
         return Task::createFromTuple($result[0]);
     }
 
     public function truncate()
     {
-        $this->client->call("queue.tube.$this->tubeName:truncate");
+        $this->client->call("queue.tube.$this->name:truncate");
     }
 
     /**
@@ -154,7 +162,7 @@ class Queue
      */
     public function stats($path = null)
     {
-        $result = $this->client->call('queue.stats', [$this->tubeName]);
+        $result = $this->client->call('queue.stats', [$this->name]);
 
         if (null === $path) {
             return $result[0][0];

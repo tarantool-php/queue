@@ -12,7 +12,6 @@
 namespace Tarantool\Queue\Tests\Unit;
 
 use Tarantool\Queue\Queue;
-use Tarantool\Queue\Task;
 
 class QueueTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,5 +41,18 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             [new \stdClass(), 'stdClass'],
             [[], 'array'],
         ];
+    }
+
+    public function testGetName()
+    {
+        $clientClass = class_exists('Tarantool') ? 'Tarantool' : 'Tarantool\Client\Client';
+        $client = $this->getMockBuilder($clientClass)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $queueName = uniqid('queue_', true);
+        $queue = new Queue($client, $queueName);
+
+        $this->assertSame($queueName, $queue->getName());
     }
 }

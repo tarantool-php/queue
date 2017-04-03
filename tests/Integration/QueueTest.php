@@ -53,22 +53,22 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $name = preg_replace('/^test([^\s]+).*$/', '\1', $this->getName());
-        $name = strtolower($name);
+        $testName = preg_replace('/^test([^\s]+).*$/', '\1', $this->getName());
+        $testName = strtolower($testName);
 
         $tubeType = $this->getTubeType();
-        $tubeName = sprintf('t_%s_%s', $tubeType, $name);
+        $queueName = sprintf('t_%s_%s', $tubeType, $testName);
 
-        self::$client->evaluate('create_tube(...)', [$tubeName, $tubeType]);
+        self::$client->evaluate('create_tube(...)', [$queueName, $tubeType]);
 
         $ann = $this->getAnnotations();
         if (!empty($ann['method']['eval'])) {
             foreach ($ann['method']['eval'] as $eval) {
-                self::$client->evaluate(str_replace('%tube_name%', $tubeName, $eval));
+                self::$client->evaluate(str_replace('%tube_name%', $queueName, $eval));
             }
         }
 
-        $this->queue = new Queue(self::$client, $tubeName);
+        $this->queue = new Queue(self::$client, $queueName);
     }
 
     protected function tearDown()
