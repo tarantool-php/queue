@@ -24,8 +24,8 @@ class ClientAdapter
 
     public function call($funcName, array $args = [])
     {
-        $result = $this->client->call($funcName, $args);
+        $data = $this->client->call($funcName, $args)->getData();
 
-        return isset($result->getData()[0][0]) ? $result->getData() : [$result->getData()];
+        return isset($data[0][0]) ? $data : [$data];
     }
 }
