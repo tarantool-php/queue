@@ -45,8 +45,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $clientClass = class_exists('Tarantool') ? 'Tarantool' : 'Tarantool\Client\Client';
-        $client = $this->getMockBuilder($clientClass)
+        $client = $this->getMockBuilder('Tarantool\Client\Client')
             ->disableOriginalConstructor()
             ->getMock();
 
