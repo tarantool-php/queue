@@ -53,16 +53,20 @@ in the Lua script:
 ```php
 use Tarantool\Queue\Queue;
 
-$tarantool = new Tarantool();
-$queue = new Queue($tarantool, 'foobar');
+...
+
+$queue = new Queue($client, 'foobar');
 ```
+
+where `$client` is either an instance of the Tarantool class from the [pecl extension](https://github.com/tarantool/tarantool-php) 
+or an instance of `Tarantool\Client\Client` from the [pure PHP package](https://github.com/tarantool-php/client).
 
 
 ### Data types
 
 Under the hood Tarantool uses [MessagePack](http://msgpack.org/) binary format to serialize/deserialize
-data being stored in a queue. This means that it's safe to use such data types as `null`, `bool`, `int`,
-`float`, `string`, `binary string` and `array` without any manual pre- or post-processing:
+data being stored in a queue. It can handle most of the PHP data types (except resources and closures) without 
+any manual pre- or post-processing:
 
 ```php
 $queue->put('foo');
@@ -70,7 +74,12 @@ $queue->put(true);
 $queue->put(42);
 $queue->put(4.2);
 $queue->put(['foo' => ['bar' => ['baz' => null]]]);
+$queue->put(new MyObject());
 ```
+
+> *Note*
+>
+> Object serialization is only supported when [tarantool/client](https://github.com/tarantool-php/client) is used.
 
 
 ### Tasks
@@ -230,21 +239,22 @@ $ ./dockerfile.sh | docker build -t queue -
 Then run Tarantool instance (needed for integration tests):
 
 ```sh
-$ docker run -d --name tarantool -v $(pwd):/queue tarantool/tarantool \
-    /queue/tests/Integration/queues.lua
+$ docker network create tarantool-php
+$ docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
+    tarantool/tarantool:1.7 tarantool /queue/tests/Integration/queues.lua
 ```
 
 And then run both unit and integration tests:
 
 ```sh
-$ docker run --rm --name queue --link tarantool -v $(pwd):/queue -w /queue queue
+$ docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue queue
 ```
 
 To run only integration or unit tests, set the `PHPUNIT_OPTS` environment variable
 to either `--testsuite Integration` or `--testsuite Unit` respectively, e.g.:
 
 ```sh
-$ docker run --rm --name queue -v $(pwd):/queue -w /queue \
+$ docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue \
     -e PHPUNIT_OPTS='--testsuite Unit' queue
 ```
 

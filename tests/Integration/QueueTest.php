@@ -11,6 +11,9 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use Tarantool\Client\Client;
+use Tarantool\Client\Connection\StreamConnection;
+use Tarantool\Client\Packer\PurePacker;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
@@ -22,18 +25,29 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     protected $queue;
 
     /**
-     * @var \Tarantool
+     * @var \Tarantool|\Tarantool\Client\Client
      */
     private static $client;
 
     public static function setUpBeforeClass()
     {
-        self::$client = new \Tarantool(getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
+        if (class_exists('Tarantool', false)) {
+            self::$client = new \Tarantool(
+                getenv('TARANTOOL_HOST'),
+                getenv('TARANTOOL_PORT')
+            );
+
+            return;
+        }
+
+        $uri = sprintf('tcp://%s:%s', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
+        $conn = new StreamConnection($uri);
+
+        self::$client = new Client($conn, new PurePacker());
     }
 
     public static function tearDownAfterClass()
     {
-        self::$client->disconnect();
         self::$client = null;
     }
 
@@ -240,6 +254,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'take' => 3,
                 'kick' => 1,
                 'release' => 1,
+                'touch' => 0,
                 'put' => 5,
                 'bury' => 2,
             ],
@@ -267,14 +282,102 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'put' => 0,
                 'release' => 0,
                 'take' => 0,
+                'touch' => 0,
             ],
         ], $stats);
     }
 
     /**
+     * @eval queue.tube['%tube_name%']:put('stat_0')
+     * @eval queue.tube['%tube_name%']:put('stat_1')
+     * @eval queue.tube['%tube_name%']:put('stat_2')
+     * @eval queue.tube['%tube_name%']:put('stat_3')
+     * @eval queue.tube['%tube_name%']:put('stat_4')
+     * @eval queue.tube['%tube_name%']:put('stat_5')
+     * @eval queue.tube['%tube_name%']:put('stat_6')
+     * @eval queue.tube['%tube_name%']:put('stat_7')
+     * @eval queue.tube['%tube_name%']:put('stat_8')
+     * @eval queue.tube['%tube_name%']:put('stat_9')
+     * @eval queue.tube['%tube_name%']:take(.001)
+     * @eval queue.tube['%tube_name%']:release(0)
+     * @eval queue.tube['%tube_name%']:take(.001)
+     * @eval queue.tube['%tube_name%']:ack(0)
+     * @eval queue.tube['%tube_name%']:bury(1)
+     * @eval queue.tube['%tube_name%']:bury(2)
+     * @eval queue.tube['%tube_name%']:bury(3)
+     * @eval queue.tube['%tube_name%']:kick(1)
+     * @eval queue.tube['%tube_name%']:delete(6)
+     * @eval queue.tube['%tube_name%']:delete(7)
+     * @eval queue.tube['%tube_name%']:delete(8)
+     * @eval queue.tube['%tube_name%']:take(.001)
+     */
+    public function testStatsPath()
+    {
+        $this->assertSameArray([
+            'taken' => 1,
+            'buried' => 2,
+            'ready' => 3,
+            'done' => 4,
+            'delayed' => 0,
+            'total' => 6,
+        ], $this->queue->stats('tasks'));
+
+        $this->assertSame(1, $this->queue->stats('tasks.taken'));
+        $this->assertSame(2, $this->queue->stats('tasks.buried'));
+        $this->assertSame(3, $this->queue->stats('tasks.ready'));
+        $this->assertSame(4, $this->queue->stats('tasks.done'));
+        $this->assertSame(0, $this->queue->stats('tasks.delayed'));
+        $this->assertSame(6, $this->queue->stats('tasks.total'));
+
+        $this->assertSameArray([
+            'ack' => 1,
+            'delete' => 3,
+            'take' => 3,
+            'kick' => 1,
+            'release' => 1,
+            'touch' => 0,
+            'put' => 10,
+            'bury' => 3,
+        ], $this->queue->stats('calls'));
+
+        $this->assertSame(1, $this->queue->stats('calls.ack'));
+        $this->assertSame(3, $this->queue->stats('calls.delete'));
+        $this->assertSame(3, $this->queue->stats('calls.take'));
+        $this->assertSame(1, $this->queue->stats('calls.kick'));
+        $this->assertSame(1, $this->queue->stats('calls.release'));
+        $this->assertSame(0, $this->queue->stats('calls.touch'));
+        $this->assertSame(10, $this->queue->stats('calls.put'));
+        $this->assertSame(3, $this->queue->stats('calls.bury'));
+    }
+
+    /**
+     * @dataProvider provideStatsInvalidPathData
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /^Invalid path ".*?"\.$/
+     */
+    public function testStatsInvalidPath($path)
+    {
+        $this->queue->stats($path);
+    }
+
+    public function provideStatsInvalidPathData()
+    {
+        return [
+            [''],
+            ['.'],
+            ['foo'],
+            ['tasks.foo'],
+            ['.tasks'],
+            ['tasks.'],
+            ['calls.foo'],
+            ['.calls'],
+            ['calls.'],
+        ];
+    }
+
+    /**
      * @dataProvider provideFailureCallbackData
      * @expectedException \Exception
-     * @expectedExceptionMessageRegExp /^Query error/
      */
     public function testThrowException($methodName, array $args)
     {
@@ -305,6 +408,14 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedId, $task->getId());
         $this->assertSame($expectedState, $task->getState());
         $this->assertSame($expectedData, $task->getData());
+    }
+
+    protected function assertSameArray(array $expected, array $actual)
+    {
+        ksort($expected);
+        ksort($actual);
+
+        $this->assertSame($expected, $actual);
     }
 
     protected function getTubeType()

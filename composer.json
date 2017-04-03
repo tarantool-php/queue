@@ -1,7 +1,7 @@
 {
     "name": "tarantool/queue",
     "description": "PHP bindings for Tarantool Queue.",
-    "keywords": ["queue", "schedule", "delayed", "priority", "ttl", "ttr", "task", "job", "worker", "tarantool"],
+    "keywords": ["queue", "schedule", "delayed", "priority", "ttl", "ttr", "task", "job", "worker", "tarantool", "nosql"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -11,8 +11,15 @@
         }
     ],
     "require": {
-        "php": "^5.4|^7.0",
-        "ext-tarantool": "*"
+        "php": "^5.4|^7.0"
+    },
+    "require-dev": {
+        "rybakit/msgpack": "@dev",
+        "tarantool/client": "@dev"
+    },
+    "suggest": {
+        "ext-tarantool": "For using pecl extension",
+        "tarantool/client": "For using pure client"
     },
     "autoload": {
         "psr-4": {
@@ -22,11 +29,6 @@
     "autoload-dev" : {
         "psr-4": {
             "Tarantool\\Queue\\Tests\\": "tests/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
         }
     }
 }
