@@ -76,6 +76,19 @@ class Queue
 
     /**
      * @param int $taskId
+     * @param int|float $increment
+     *
+     * @return Task|null
+     */
+    public function touch($taskId, $increment)
+    {
+        $result = $this->client->call("queue.tube.$this->name:touch", [$taskId, $increment]);
+
+        return empty($result[0]) ? null : Task::createFromTuple($result[0]);
+    }
+
+    /**
+     * @param int $taskId
      *
      * @return Task
      */

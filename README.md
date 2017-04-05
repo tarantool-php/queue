@@ -127,13 +127,13 @@ If a timeout value is supplied the call will wait `timeout` seconds until a `REA
 The method returns either a [Task](#tasks) object or `null`:
 
 ```php
-$task = $queue->take();
+$taskOrNull = $queue->take();
 
 // wait 2 seconds
-$task = $queue->take(2);
+$taskOrNull = $queue->take(2);
 
 // wait 100 milliseconds
-$task = $queue->take(.1);
+$taskOrNull = $queue->take(.1);
 ```
 
 After successful execution, a task can be marked as acknowledged (that will also delete the task from a queue):
@@ -151,7 +151,7 @@ Or put back into the queue in case it cannot be executed:
 ```php
 $task = $queue->release($task->getId());
 
-// for ttl-like queues you can specify a delay
+// for *ttl queues you can specify a delay
 $task = $queue->release($task->getId(), ['delay' => 30]);
 ```
 
@@ -171,6 +171,12 @@ To reset buried task(s) back to `READY` state:
 
 ```php
 $count = $queue->kick(3); // kick 3 buried tasks
+```
+
+To increase TTR and/or TTL of a running task (only for *ttl queues):
+
+```php
+$taskOrNull = $queue->touch($takenTask->getId(), 5); // increase ttr/ttl to 5 seconds
 ```
 
 A task (in any state) can be deleted permanently with `delete()`:
