@@ -151,7 +151,7 @@ Or put back into the queue in case it cannot be executed:
 ```php
 $task = $queue->release($task->getId());
 
-// for ttl-like queues you can specify a delay
+// for *ttl queues you can specify a delay
 $task = $queue->release($task->getId(), ['delay' => 30]);
 ```
 
@@ -176,7 +176,7 @@ $count = $queue->kick(3); // kick 3 buried tasks
 To increase TTR and/or TTL of a running task (only for *ttl queues):
 
 ```php
-$taskOrNull = $queue->touch($takenTask->getId(), 5);
+$taskOrNull = $queue->touch($takenTask->getId(), 5); // increase ttr/ttl to 5 seconds
 ```
 
 A task (in any state) can be deleted permanently with `delete()`:
