@@ -41,6 +41,51 @@ trait Ttl
     }
 
     /**
+     * @eval queue.tube['%tube_name%']:put('touch_ttr_1', {ttr = 1})
+     */
+    public function testTouchTimeToRun()
+    {
+        $task1 = $this->queue->take(.1);
+        $task2 = $this->queue->touch($task1->getId(), 1);
+        sleep(1);
+        $task3 = $this->queue->take(.1);
+
+        $this->assertTaskInstance($task2);
+        $this->assertSame('touch_ttr_1', $task2->getData());
+        $this->assertEquals($task1, $task2);
+        $this->assertNull($task3);
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('touch_ttl_1', {ttl = 1})
+     */
+    public function testTouchTimeToLive()
+    {
+        $task1 = $this->queue->take(.1);
+        $task2 = $this->queue->touch($task1->getId(), 1);
+        $this->queue->release($task1->getId());
+        sleep(1);
+        $task3 = $this->queue->take(.1);
+
+        $this->assertTaskInstance($task2);
+        $this->assertSame('touch_ttl_1', $task2->getData());
+        $this->assertEquals($task1, $task2);
+        $this->assertEquals($task2, $task3);
+    }
+
+    /**
+     * @eval queue.tube['%tube_name%']:put('touch_invalid_interval')
+     */
+    public function testTouchInvalidInterval()
+    {
+        $task = $this->queue->take(.1);
+
+        foreach ([0, -1] as $interval) {
+            $this->assertNull($this->queue->touch($task->getId(), $interval));
+        }
+    }
+
+    /**
      * @eval queue.tube['%tube_name%']:put('pri_low', {pri = 2})
      * @eval queue.tube['%tube_name%']:put('pri_high', {pri = 1})
      */
