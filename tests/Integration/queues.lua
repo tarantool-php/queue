@@ -18,7 +18,6 @@ console = require('console')
 console.listen('127.0.0.1:33333')
 
 queue = require('queue')
-queue.start()
 
 function create_tube(tube_name, tube_type, opts)
     if queue.tube[tube_name] then

@@ -26,12 +26,10 @@ is configured, up and running. The minimal required configuration might look lik
 ```lua
 -- queues.lua
 
-box.cfg {}
+box.cfg{listen=3301}
 
 queue = require('queue')
-queue.start()
-
-queue.create_tube('foobar', 'fifottl', { if_not_exists=true })
+queue.create_tube('foobar', 'fifottl', {if_not_exists=true})
 ```
 
 > You can read more about the box configuration in the official [Tarantool documentation](http://tarantool.org/doc/book/configuration/index.html#initialization-file).
