@@ -26,7 +26,7 @@ is configured, up and running. The minimal required configuration might look lik
 ```lua
 -- queues.lua
 
-box.cfg{listen=3301}
+box.cfg {listen=3301}
 
 queue = require('queue')
 queue.create_tube('foobar', 'fifottl', {if_not_exists=true})
