@@ -107,12 +107,12 @@ Task::isDelayed()
 As you've already seen, to insert a task into a queue you need to call `put()` method, which accepts
 two arguments: the data you want to process and optional array of task options, which this particular
 queue supports. For example, `fifottl` queue (which we defined earlier in our Lua config file),
-supports `delay`, `ttl`, `ttr`, `pri` and `temporary` options:
+supports `delay`, `ttl`, `ttr` and `pri` options:
 
 ```php
-$queue->put('foo', ['delay' => 30]);
-$queue->put('bar', ['ttl' => 5]);
-$queue->put('baz', ['ttr' => 10, 'pri' => 42]);
+$queue->put('foo', [TtlOptions::DELAY => 30]);
+$queue->put('bar', [TtlOptions::TTL => 5]);
+$queue->put('baz', [TtlOptions::TTR => 10, TtlOptions::PRI => 42]);
 ```
 
 > See the full list of available options [here](https://github.com/tarantool/queue#queue-types).
@@ -150,7 +150,7 @@ Or put back into the queue in case it cannot be executed:
 $task = $queue->release($task->getId());
 
 // for *ttl queues you can specify a delay
-$task = $queue->release($task->getId(), ['delay' => 30]);
+$task = $queue->release($task->getId(), [TtlOptions:DELAY => 30]);
 ```
 
 To look at a task without changing its state, use:
