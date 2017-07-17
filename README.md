@@ -110,9 +110,9 @@ queue supports. For example, `fifottl` queue (which we defined earlier in our Lu
 supports `delay`, `ttl`, `ttr` and `pri` options:
 
 ```php
-$queue->put('foo', [FifottlOptions::DELAY => 30]);
-$queue->put('bar', [FifottlOptions::TTL => 5]);
-$queue->put('baz', [FifottlOptions::TTR => 10, FifottlOptions::PRI => 42]);
+$queue->put('foo', [TtlOptions::DELAY => 30]);
+$queue->put('bar', [TtlOptions::TTL => 5]);
+$queue->put('baz', [TtlOptions::TTR => 10, TtlOptions::PRI => 42]);
 ```
 
 > See the full list of available options [here](https://github.com/tarantool/queue#queue-types).
@@ -150,7 +150,7 @@ Or put back into the queue in case it cannot be executed:
 $task = $queue->release($task->getId());
 
 // for *ttl queues you can specify a delay
-$task = $queue->release($task->getId(), [FifottlOptions:DELAY => 30]);
+$task = $queue->release($task->getId(), [TtlOptions:DELAY => 30]);
 ```
 
 To look at a task without changing its state, use:
