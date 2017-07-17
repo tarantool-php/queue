@@ -11,7 +11,7 @@
 
 namespace Tarantool\Queue;
 
-abstract class UtubeOptions implements Options
+abstract class UtubeOptions
 {
     const UTUBE = 'utube';
 }

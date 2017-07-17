@@ -11,6 +11,6 @@
 
 namespace Tarantool\Queue;
 
-abstract class FifottlOptions extends FifoOptions implements TtlOptions
+abstract class FifottlOptions implements TtlOptions
 {
 }
