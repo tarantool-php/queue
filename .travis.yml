@@ -14,6 +14,7 @@ env:
   - IMAGE='php:5.6-cli' TNT_CLIENT=pure
   - IMAGE='php:7.0-cli' TNT_CLIENT=pure
   - IMAGE='php:7.1-cli' TNT_CLIENT=pure PHPUNIT_OPTS='--coverage-clover=coverage.clover'
+  - IMAGE='php:7.2-cli' TNT_CLIENT=pure
 
 install:
   - ./dockerfile.sh | tee /dev/tty | docker build -t queue -
