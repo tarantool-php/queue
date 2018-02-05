@@ -11,6 +11,11 @@
 
 namespace Tarantool\Queue;
 
-abstract class UtubettlOptions extends UtubeOptions implements TtlOptions
+abstract class Options
 {
+    const DELAY = 'delay';
+    const PRI = 'pri';
+    const TTL = 'ttl';
+    const TTR = 'ttr';
+    const UTUBE = 'utube';
 }
