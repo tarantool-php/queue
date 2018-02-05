@@ -237,9 +237,8 @@ $total = $queue->stats('tasks.total');
 ### Custom methods
 
 Thanks to flexible nature of the [tarantool/queue](https://github.com/tarantool/queue/) module, 
-you can easily create your own queue drivers or extend existing ones with an additional functionality.   
-For example, let's say you want to add the `put_many` method to your `foobar` queue, which inserts 
-multiple tasks in a transaction:  
+you can easily create your own queue drivers or extend existing ones with an additional functionality. 
+For example, you added the `put_many` method to your `foobar` queue, which inserts multiple tasks in a transaction:  
 
 ```lua
 -- queues.lua
@@ -259,7 +258,7 @@ queue.tube.foobar.put_many = function(self, items)
 end
 ```
 
-To call it, pass the method name and corresponding arguments to `Queue::call()`:
+To call this method on a `$queue` object, use `Queue::call()`:
 
 ```php
 $result = $queue->call('put_many', [
