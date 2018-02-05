@@ -234,6 +234,41 @@ $total = $queue->stats('tasks.total');
 ```
 
 
+### Custom methods
+
+Thanks to flexible nature of the [tarantool/queue](https://github.com/tarantool/queue/) module, 
+you can easily create your own queue drivers or extend existing ones with an additional functionality.   
+For example, let's say you want to add the `put_many` method to your `foobar` queue, which inserts 
+multiple tasks in a transaction:  
+
+```lua
+-- queues.lua
+
+...
+
+queue.tube.foobar.put_many = function(self, items)
+    local put = {}
+
+    box.begin()
+    for k, item in pairs(items) do
+        put[k] = tube:put(unpack(item))
+    end
+    box.commit()
+
+    return put
+end
+```
+
+To call it, pass the method name and corresponding arguments to `Queue::call()`:
+
+```php
+$result = $queue->call('put_many', [
+    'foo' => ['foo', []], 
+    'bar' => ['bar', [Options::DELAY => 30]],
+]);
+```
+
+
 ## Tests
 
 The easiest way to run tests is with Docker. First, build an image using the [dockerfile.sh](dockerfile.sh) generator:

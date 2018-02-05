@@ -191,4 +191,15 @@ class Queue
 
         return $result;
     }
+
+    /**
+     * @param string $method
+     * @param array $args
+     *
+     * @return array
+     */
+    public function call($method, array $args = [])
+    {
+        return $this->client->call("queue.tube.$this->name:$method", $args);
+    }
 }

@@ -376,6 +376,16 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @eval queue.tube['%tube_name%'].pow = function(self, base, exp) return math.pow(base, exp) end
+     */
+    public function testCall()
+    {
+        $result = $this->queue->call('pow', [2, 8]);
+
+        $this->assertSame(256, $result[0][0]);
+    }
+
+    /**
      * @dataProvider provideFailureCallbackData
      * @expectedException \Exception
      */
