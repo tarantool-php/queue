@@ -257,6 +257,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'touch' => 0,
                 'put' => 5,
                 'bury' => 2,
+                'ttr' => 0,
+                'delay' => 0,
+                'ttl' => 0,
             ],
         ], $stats, '', 0.0, 3, true);
     }
@@ -283,6 +286,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
                 'release' => 0,
                 'take' => 0,
                 'touch' => 0,
+                'ttr' => 0,
+                'delay' => 0,
+                'ttl' => 0,
             ],
         ], $stats);
     }
@@ -338,6 +344,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
             'touch' => 0,
             'put' => 10,
             'bury' => 3,
+            'ttr' => 0,
+            'delay' => 0,
+            'ttl' => 0,
         ], $this->queue->stats('calls'));
 
         $this->assertSame(1, $this->queue->stats('calls.ack'));
