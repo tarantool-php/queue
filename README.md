@@ -261,10 +261,10 @@ end
 To call this method on a `$queue` object, use `Queue::call()`:
 
 ```php
-$result = $queue->call('put_many', [
+$result = $queue->call('put_many', [[
     'foo' => ['foo', []], 
     'bar' => ['bar', [Options::DELAY => 30]],
-]);
+]]);
 ```
 
 
