@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ -z "$IMAGE" ]] ; then
-    IMAGE='php:7.1-cli'
+    IMAGE='php:7.2-cli'
 fi
 
 if [[ -z "$TNT_CLIENT" ]] ; then
@@ -32,7 +32,7 @@ FROM $IMAGE
 RUN apt-get update && \\
     apt-get install -y git curl zlib1g-dev${RUN_CMDS} && \\
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \\
-    composer global require 'phpunit/phpunit:^4.8|^5.0|^6.0'${RUN_POST_CMDS}
+    composer global require 'phpunit/phpunit'${RUN_POST_CMDS}
 
 ENV PATH=~/.composer/vendor/bin:\$PATH
 ENV TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301
