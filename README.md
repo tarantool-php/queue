@@ -281,7 +281,7 @@ Then run Tarantool instance (needed for integration tests):
 ```sh
 $ docker network create tarantool-php
 $ docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
-    tarantool/tarantool:1.7 tarantool /queue/tests/Integration/queues.lua
+    tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
 ```
 
 And then run both unit and integration tests:
