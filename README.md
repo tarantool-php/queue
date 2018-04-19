@@ -32,8 +32,8 @@ queue = require('queue')
 queue.create_tube('foobar', 'fifottl', {if_not_exists=true})
 ```
 
-> You can read more about the box configuration in the official [Tarantool documentation](http://tarantool.org/doc/book/configuration/index.html#initialization-file).
-> For more information about the queue configuration check out [queue's README](https://github.com/tarantool/queue/blob/master/README.md).
+> *You can read more about the box configuration in the official [Tarantool documentation](http://tarantool.org/doc/book/configuration/index.html#initialization-file).
+> For more information about the queue configuration check out [queue's README](https://github.com/tarantool/queue/blob/master/README.md).*
 
 To start the instance you need to copy (or symlink) `queues.lua` file into the `/etc/tarantool/instances.enabled`
 directory and run the following command:
@@ -75,9 +75,7 @@ $queue->put(['foo' => ['bar' => ['baz' => null]]]);
 $queue->put(new MyObject());
 ```
 
-> *Note*
->
-> Object serialization is only supported when [tarantool/client](https://github.com/tarantool-php/client) is used.
+> *Object serialization is only supported when [tarantool/client](https://github.com/tarantool-php/client) is used.*
 
 
 ### Tasks
@@ -117,7 +115,7 @@ $queue->put('bar', [Options::TTL => 5]);
 $queue->put('baz', [Options::TTR => 10, Options::PRI => 42]);
 ```
 
-> See the full list of available options [here](https://github.com/tarantool/queue#queue-types).
+> *See the full list of available options [here](https://github.com/tarantool/queue#queue-types).*
 
 
 ### Consumer API
@@ -191,9 +189,9 @@ To delete all tasks in a queue:
 $queue->truncate();
 ```
 
-> For a detailed API documentation, please read the section 
-"[Using the queue module](https://github.com/tarantool/queue#using-the-queue-module)" 
-of the [queue's README](https://github.com/tarantool/queue/blob/master/README.md).
+> *For a detailed API documentation, please read the section 
+> "[Using the queue module](https://github.com/tarantool/queue#using-the-queue-module)" 
+> of the [queue's README](https://github.com/tarantool/queue/blob/master/README.md).*
 
 
 ### Statistics
