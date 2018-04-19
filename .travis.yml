@@ -19,7 +19,7 @@ install:
 
 script:
   - docker network create tarantool-php
-  - docker run -d --net=tarantool-php -v `pwd`:/queue tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
+  - docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
   - docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue -e PHPUNIT_OPTS="$PHPUNIT_OPTS" queue
 
 after_script:
