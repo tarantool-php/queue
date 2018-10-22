@@ -28,8 +28,8 @@ final class Queue
     {
         if ($client instanceof Client) {
             $client = new ClientAdapter($client);
-        } else if (!$client instanceof \Tarantool) {
-            throw new \InvalidArgumentException(sprintf(
+        } elseif (!$client instanceof \Tarantool) {
+            throw new \InvalidArgumentException(\sprintf(
                 '%s() expects parameter 1 to be Tarantool or %s, %s given.',
                 __METHOD__, Client::class, \is_object($client) ? \get_class($client) : \gettype($client)
             ));
@@ -129,9 +129,9 @@ final class Queue
     /**
      * @param string|null $path
      *
-     * @return array|int
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return array|int
      */
     public function stats(string $path = null)
     {
@@ -142,9 +142,9 @@ final class Queue
         }
 
         $result = $result[0][0];
-        foreach (explode('.', $path) as $key) {
+        foreach (\explode('.', $path) as $key) {
             if (!isset($result[$key])) {
-                throw new \InvalidArgumentException(sprintf('Invalid path "%s".', $path));
+                throw new \InvalidArgumentException(\sprintf('Invalid path "%s".', $path));
             }
             $result = $result[$key];
         }
