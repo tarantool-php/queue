@@ -11,23 +11,23 @@
 
 namespace Tarantool\Queue\Tests\Unit;
 
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Tarantool\Client\Client;
 use Tarantool\Queue\Queue;
 
-class QueueTest extends \PHPUnit_Framework_TestCase
+final class QueueTest extends TestCase
 {
     /**
      * @dataProvider provideConstructorInvalidArgumentData
      */
-    public function testConstructorThrowsInvalidArgumentException($invalidClient, $type)
+    public function testConstructorThrowsInvalidArgumentException($invalidClient, string $type) : void
     {
         try {
             new Queue($invalidClient, 'foobar');
         } catch (\InvalidArgumentException $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e);
-            $this->assertSame(
-                "Tarantool\\Queue\\Queue::__construct() expects parameter 1 to be Tarantool or Tarantool\\Client\\Client, $type given.",
-                $e->getMessage()
-            );
+            self::assertContains('__construct() expects parameter 1 to be ', $e->getMessage());
+            self::assertStringEndsWith(", $type given.", $e->getMessage());
 
             return;
         }
@@ -35,7 +35,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
         $this->fail();
     }
 
-    public function provideConstructorInvalidArgumentData()
+    public function provideConstructorInvalidArgumentData() : iterable
     {
         return [
             [new \stdClass(), 'stdClass'],
@@ -43,15 +43,14 @@ class QueueTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetName() : void
     {
-        $client = $this->getMockBuilder('Tarantool\Client\Client')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var Client|MockObject $client */
+        $client = $this->createMock(Client::class);
 
         $queueName = uniqid('queue_', true);
         $queue = new Queue($client, $queueName);
 
-        $this->assertSame($queueName, $queue->getName());
+        self::assertSame($queueName, $queue->getName());
     }
 }

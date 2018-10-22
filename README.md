@@ -14,7 +14,7 @@ Lua modules, called [LuaRocks](https://luarocks.org/). This package provides PHP
 The recommended way to install the library is through [Composer](http://getcomposer.org):
 
 ```sh
-$ composer require tarantool/queue
+composer require tarantool/queue
 ```
 
 
@@ -39,7 +39,7 @@ To start the instance you need to copy (or symlink) `queues.lua` file into the `
 directory and run the following command:
 
 ```sh
-$ sudo tarantoolctl start queues
+sudo tarantoolctl start queues
 ```
 
 
@@ -271,28 +271,28 @@ $result = $queue->call('put_many', [[
 The easiest way to run tests is with Docker. First, build an image using the [dockerfile.sh](dockerfile.sh) generator:
 
 ```sh
-$ ./dockerfile.sh | docker build -t queue -
+./dockerfile.sh | docker build -t queue -
 ```
 
 Then run Tarantool instance (needed for integration tests):
 
 ```sh
-$ docker network create tarantool-php
-$ docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
+docker network create tarantool-php
+docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
     tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
 ```
 
 And then run both unit and integration tests:
 
 ```sh
-$ docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue queue
+docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue queue
 ```
 
 To run only integration or unit tests, set the `PHPUNIT_OPTS` environment variable
 to either `--testsuite Integration` or `--testsuite Unit` respectively, e.g.:
 
 ```sh
-$ docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue \
+docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue \
     -e PHPUNIT_OPTS='--testsuite Unit' queue
 ```
 

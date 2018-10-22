@@ -13,7 +13,7 @@ namespace Tarantool\Queue;
 
 use Tarantool\Client\Client;
 
-class ClientAdapter
+final class ClientAdapter
 {
     private $client;
 
@@ -22,7 +22,7 @@ class ClientAdapter
         $this->client = $client;
     }
 
-    public function call($funcName, array $args = [])
+    public function call(string $funcName, array $args = []) : array
     {
         $data = $this->client->call($funcName, $args)->getData();
 

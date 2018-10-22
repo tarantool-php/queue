@@ -11,6 +11,6 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
-class UtubeQueueTest extends QueueTest
+final class UtubeQueueTest extends QueueTest
 {
 }

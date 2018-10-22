@@ -31,11 +31,10 @@ FROM $IMAGE
 
 RUN apt-get update && \\
     apt-get install -y git curl zlib1g-dev${RUN_CMDS} && \\
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \\
-    composer global require 'phpunit/phpunit'${RUN_POST_CMDS}
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer${RUN_POST_CMDS}
 
 ENV PATH=~/.composer/vendor/bin:\$PATH
 ENV TARANTOOL_HOST=tarantool TARANTOOL_PORT=3301
 
-CMD if [ ! -f composer.lock ]; then composer install; fi && ~/.composer/vendor/bin/phpunit\${PHPUNIT_OPTS:+ }\$PHPUNIT_OPTS
+CMD if [ ! -f composer.lock ]; then composer install; fi && vendor/bin/phpunit\${PHPUNIT_OPTS:+ }\$PHPUNIT_OPTS
 "

@@ -17,26 +17,26 @@ final class Task
     private $state;
     private $data;
 
-    private function __construct($id, $state, $data)
+    private function __construct(int $id, string $state, $data)
     {
         $this->id = $id;
         $this->state = $state;
         $this->data = $data;
     }
 
-    public static function createFromTuple(array $tuple)
+    public static function createFromTuple(array $tuple) : self
     {
-        list($id, $state, $data) = $tuple + [2 => null];
+        [$id, $state, $data] = $tuple + [2 => null];
 
         return new self($id, $state, $data);
     }
 
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
 
-    public function getState()
+    public function getState() : string
     {
         return $this->state;
     }
@@ -46,27 +46,27 @@ final class Task
         return $this->data;
     }
 
-    public function isReady()
+    public function isReady() : bool
     {
         return States::READY === $this->state;
     }
 
-    public function isTaken()
+    public function isTaken() : bool
     {
         return States::TAKEN === $this->state;
     }
 
-    public function isDone()
+    public function isDone() : bool
     {
         return States::DONE === $this->state;
     }
 
-    public function isBuried()
+    public function isBuried() : bool
     {
         return States::BURIED === $this->state;
     }
 
-    public function isDelayed()
+    public function isDelayed() : bool
     {
         return States::DELAYED === $this->state;
     }

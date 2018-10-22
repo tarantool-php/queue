@@ -11,7 +11,7 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
-class FifottlQueueTest extends QueueTest
+final class FifottlQueueTest extends QueueTest
 {
     use Ttl;
 }

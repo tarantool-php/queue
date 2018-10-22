@@ -11,7 +11,7 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
-class UtubettlQueueTest extends QueueTest
+final class UtubettlQueueTest extends QueueTest
 {
     use Ttl;
 }

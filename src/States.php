@@ -11,11 +11,11 @@
 
 namespace Tarantool\Queue;
 
-abstract class States
+final class States
 {
-    const READY = 'r';
-    const TAKEN = 't';
-    const DONE = '-';
-    const BURIED = '!';
-    const DELAYED = '~';
+    public const READY = 'r';
+    public const TAKEN = 't';
+    public const DONE = '-';
+    public const BURIED = '!';
+    public const DELAYED = '~';
 }

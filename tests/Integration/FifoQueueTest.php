@@ -11,6 +11,6 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
-class FifoQueueTest extends QueueTest
+final class FifoQueueTest extends QueueTest
 {
 }
