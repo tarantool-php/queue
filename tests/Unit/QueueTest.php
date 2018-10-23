@@ -45,12 +45,10 @@ final class QueueTest extends TestCase
 
     public function testGetName() : void
     {
-        if (!class_exists(Client::class)) {
-            $this->markTestSkipped('The tarantool\client package is not installed.');
-        }
-
-        /** @var Client|MockObject $client */
-        $client = $this->createMock(Client::class);
+        /** @var \Tarantool|Client|MockObject $client */
+        $client = class_exists(\Tarantool::class, false)
+            ? $this->createMock(\Tarantool::class)
+            : $this->createMock(Client::class);
 
         $queueName = uniqid('queue_', true);
         $queue = new Queue($client, $queueName);
