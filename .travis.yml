@@ -22,5 +22,5 @@ script:
 after_script:
   - if [[ -f coverage.clover ]]; then
       curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
-      docker run --rm -v $(pwd):/coverage -w /coverage queue php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
+      docker run --rm -v $(pwd):/queue -w /queue queue php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
     fi
