@@ -13,7 +13,7 @@ Lua modules, called [LuaRocks](https://luarocks.org/). This package provides PHP
 
 The recommended way to install the library is through [Composer](http://getcomposer.org):
 
-```sh
+```bash
 composer require tarantool/queue
 ```
 
@@ -38,7 +38,7 @@ queue.create_tube('foobar', 'fifottl', {if_not_exists=true})
 To start the instance you need to copy (or symlink) `queues.lua` file into the `/etc/tarantool/instances.enabled`
 directory and run the following command:
 
-```sh
+```bash
 sudo tarantoolctl start queues
 ```
 
@@ -110,9 +110,9 @@ supports `delay`, `ttl`, `ttr` and `pri` options:
 ```php
 use Tarantool\Queue\Options;
 
-$queue->put('foo', [Options::DELAY => 30]);
-$queue->put('bar', [Options::TTL => 5]);
-$queue->put('baz', [Options::TTR => 10, Options::PRI => 42]);
+$queue->put('foo', [Options::DELAY => 30.0]);
+$queue->put('bar', [Options::TTL => 5.0]);
+$queue->put('baz', [Options::TTR => 10.0, Options::PRI => 42]);
 ```
 
 > *See the full list of available options [here](https://github.com/tarantool/queue#queue-types).*
@@ -128,7 +128,7 @@ The method returns either a [Task](#tasks) object or `null`:
 $taskOrNull = $queue->take();
 
 // wait 2 seconds
-$taskOrNull = $queue->take(2);
+$taskOrNull = $queue->take(2.0);
 
 // wait 100 milliseconds
 $taskOrNull = $queue->take(.1);
@@ -150,7 +150,7 @@ Or put back into the queue in case it cannot be executed:
 $task = $queue->release($task->getId());
 
 // for *ttl queues you can specify a delay
-$task = $queue->release($task->getId(), [Options::DELAY => 30]);
+$task = $queue->release($task->getId(), [Options::DELAY => 30.0]);
 ```
 
 To look at a task without changing its state, use:
@@ -174,7 +174,7 @@ $count = $queue->kick(3); // kick 3 buried tasks
 To increase TTR and/or TTL of a running task (only for *ttl queues):
 
 ```php
-$taskOrNull = $queue->touch($takenTask->getId(), 5); // increase ttr/ttl to 5 seconds
+$taskOrNull = $queue->touch($takenTask->getId(), 5.0); // increase ttr/ttl to 5 seconds
 ```
 
 A task (in any state) can be deleted permanently with `delete()`:
@@ -270,13 +270,13 @@ $result = $queue->call('put_many', [
 
 The easiest way to run tests is with Docker. First, build an image using the [dockerfile.sh](dockerfile.sh) generator:
 
-```sh
+```bash
 ./dockerfile.sh | docker build -t queue -
 ```
 
 Then run Tarantool instance (needed for integration tests):
 
-```sh
+```bash
 docker network create tarantool-php
 docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
     tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
@@ -284,14 +284,14 @@ docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
 
 And then run both unit and integration tests:
 
-```sh
+```bash
 docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue queue
 ```
 
 To run only integration or unit tests, set the `PHPUNIT_OPTS` environment variable
 to either `--testsuite integration` or `--testsuite unit` respectively, e.g.:
 
-```sh
+```bash
 docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue \
     -e PHPUNIT_OPTS='--testsuite unit' queue
 ```

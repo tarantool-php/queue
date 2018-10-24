@@ -52,12 +52,7 @@ final class Queue
         return Task::createFromTuple($result[0]);
     }
 
-    /**
-     * @param int|float|null $timeout
-     *
-     * @return Task|null
-     */
-    public function take($timeout = null) : ?Task
+    public function take(float $timeout = null) : ?Task
     {
         $args = null === $timeout ? [] : [$timeout];
         $result = $this->client->call("queue.tube.$this->name:take", $args);
@@ -65,13 +60,7 @@ final class Queue
         return empty($result[0]) ? null : Task::createFromTuple($result[0]);
     }
 
-    /**
-     * @param int $taskId
-     * @param int|float $increment
-     *
-     * @return Task|null
-     */
-    public function touch(int $taskId, $increment) : ?Task
+    public function touch(int $taskId, float $increment) : ?Task
     {
         $result = $this->client->call("queue.tube.$this->name:touch", [$taskId, $increment]);
 
