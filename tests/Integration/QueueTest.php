@@ -44,7 +44,7 @@ abstract class QueueTest extends TestCase
             return;
         }
 
-        $uri = sprintf('tcp://%s:%s', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
+        $uri = sprintf('tcp://%s:%s', getenv('TARANTOOL_HOST'), (int) getenv('TARANTOOL_PORT'));
         $conn = new StreamConnection($uri);
 
         self::$client = new Client($conn, new PurePacker());
