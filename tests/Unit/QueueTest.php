@@ -48,7 +48,7 @@ final class QueueTest extends TestCase
         // temporary skip the test for the pecl connector until this PR is merged:
         // https://github.com/tarantool/tarantool-php/pull/134
         if (!class_exists(Client::class)) {
-            $this->markTestSkipped('The tarantool\client package is not installed.');
+            $this->markTestSkipped('The package "tarantool\client" is not installed.');
         }
 
         /** @var \Tarantool|Client|MockObject $client */
