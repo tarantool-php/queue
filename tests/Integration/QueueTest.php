@@ -392,7 +392,7 @@ abstract class QueueTest extends TestCase
      */
     public function testCall() : void
     {
-        $result = $this->queue->call('pow', [2, 8]);
+        $result = $this->queue->call('pow', 2, 8);
 
         self::assertSame(256, $result[0][0]);
     }

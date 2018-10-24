@@ -152,7 +152,7 @@ final class Queue
         return $result;
     }
 
-    public function call(string $methodName, array $args = []) : array
+    public function call(string $methodName, ...$args) : array
     {
         return $this->client->call("queue.tube.$this->name:$methodName", $args);
     }
