@@ -260,7 +260,7 @@ To call this method on a `$queue` object, use `Queue::call()`:
 
 ```php
 $result = $queue->call('put_many', [
-    'foo' => ['foo', [Options::DELAY => 30]],
+    'foo' => ['foo', [Options::DELAY => 30.0]],
     'bar' => ['bar'],
 ]);
 ```
