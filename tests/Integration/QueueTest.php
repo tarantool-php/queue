@@ -38,7 +38,7 @@ abstract class QueueTest extends TestCase
         if (class_exists(\Tarantool::class, false)) {
             self::$client = new \Tarantool(
                 getenv('TARANTOOL_HOST'),
-                getenv('TARANTOOL_PORT')
+                (int) getenv('TARANTOOL_PORT')
             );
 
             return;
