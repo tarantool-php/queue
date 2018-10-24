@@ -75,6 +75,7 @@ return Config::create()
         '@Symfony:risky' => true,
         'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => ['operators' => ['=' => null, '=>' => null]],
+        'declare_strict_types' => true,
         'native_constant_invocation' => false,
         'native_function_invocation' => false,
         'FilterableFixer/native_constant_invocation' => true,
