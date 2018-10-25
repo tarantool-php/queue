@@ -120,8 +120,8 @@ Task::isDelayed()
 
 As you've already seen, to insert a task into a queue you need to call `put()` method, which accepts
 two arguments: the data you want to process and optional array of task options, which this particular
-queue supports. For example, `fifottl` queue (which we defined earlier in our Lua config file),
-supports `delay`, `ttl`, `ttr` and `pri` options:
+queue supports. For example, `fifottl` queue (which we defined [earlier](#before-start) in our Lua config 
+file), supports `delay`, `ttl`, `ttr` and `pri` options:
 
 ```php
 use Tarantool\Queue\Options;
