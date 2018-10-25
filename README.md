@@ -10,6 +10,21 @@ Lua modules, called [LuaRocks](https://luarocks.org/). This package provides PHP
 [Tarantool Queue LuaRock](https://github.com/tarantool/queue/).
 
 
+## Table of contents
+
+ * [Installation](#installation)
+ * [Before start](#before-start)
+ * [Working with queue](#working-with-queue)
+   * [Data types](#data-types)
+   * [Tasks](#tasks)
+   * [Producer API](#producer-api)
+   * [Consumer API](#consumer-api)
+   * [Statistics](#statistics)
+   * [Custom methods](#custom-methods)
+ * [Tests](#tests)
+ * [License](#license)
+
+
 ## Installation
 
 The recommended way to install the library is through [Composer](http://getcomposer.org):
