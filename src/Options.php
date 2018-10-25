@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Tarantool Queue package.
  *
@@ -11,11 +13,11 @@
 
 namespace Tarantool\Queue;
 
-abstract class Options
+final class Options
 {
-    const DELAY = 'delay';
-    const PRI = 'pri';
-    const TTL = 'ttl';
-    const TTR = 'ttr';
-    const UTUBE = 'utube';
+    public const DELAY = 'delay';
+    public const PRI = 'pri';
+    public const TTL = 'ttl';
+    public const TTR = 'ttr';
+    public const UTUBE = 'utube';
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Tarantool Queue package.
  *
@@ -11,13 +13,15 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use PHPUnit\Framework\TestCase;
 use Tarantool\Client\Client;
 use Tarantool\Client\Connection\StreamConnection;
 use Tarantool\Client\Packer\PurePacker;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
+use Tarantool\Queue\Task;
 
-abstract class QueueTest extends \PHPUnit_Framework_TestCase
+abstract class QueueTest extends TestCase
 {
     /**
      * @var Queue
@@ -25,35 +29,35 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     protected $queue;
 
     /**
-     * @var \Tarantool|\Tarantool\Client\Client
+     * @var \Tarantool|Client
      */
     private static $client;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
-        if (class_exists('Tarantool', false)) {
+        if (class_exists(\Tarantool::class, false)) {
             self::$client = new \Tarantool(
                 getenv('TARANTOOL_HOST'),
-                getenv('TARANTOOL_PORT')
+                (int) getenv('TARANTOOL_PORT')
             );
 
             return;
         }
 
-        $uri = sprintf('tcp://%s:%s', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
+        $uri = sprintf('tcp://%s:%d', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
         $conn = new StreamConnection($uri);
 
         self::$client = new Client($conn, new PurePacker());
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         self::$client = null;
     }
 
-    protected function setUp()
+    protected function setUp() : void
     {
-        $testName = preg_replace('/^test([^\s]+).*$/', '\1', $this->getName());
+        $testName = preg_replace('/^test(\S+).*$/', '\1', $this->getName());
         $testName = strtolower($testName);
 
         $tubeType = $this->getTubeType();
@@ -71,7 +75,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $this->queue = new Queue(self::$client, $queueName);
     }
 
-    protected function tearDown()
+    protected function tearDown() : void
     {
         $this->queue = null;
     }
@@ -79,14 +83,14 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideTaskData
      */
-    public function testPut($data)
+    public function testPut($data) : void
     {
         $task = $this->queue->put($data);
 
-        $this->assertTask($task, 0, States::READY, $data);
+        self::assertTask($task, 0, States::READY, $data);
     }
 
-    public function provideTaskData()
+    public function provideTaskData() : iterable
     {
         return [
             [null],
@@ -103,73 +107,73 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @eval queue.tube['%tube_name%']:put('peek_0')
      */
-    public function testPeek()
+    public function testPeek() : void
     {
         $task = $this->queue->peek(0);
 
-        $this->assertTask($task, 0, States::READY, 'peek_0');
+        self::assertTask($task, 0, States::READY, 'peek_0');
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('take')
      */
-    public function testTake()
+    public function testTake() : void
     {
         $task = $this->queue->take();
 
-        $this->assertTask($task, 0, States::TAKEN, 'take');
+        self::assertTask($task, 0, States::TAKEN, 'take');
     }
 
-    public function testTakeNone()
+    public function testTakeNone() : void
     {
         $time = time();
         $task = $this->queue->take(2);
 
-        $this->assertGreaterThanOrEqual(2, time() - $time);
-        $this->assertNull($task);
+        self::assertGreaterThanOrEqual(2, time() - $time);
+        self::assertNull($task);
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('release_0')
      * @eval queue.tube['%tube_name%']:take()
      */
-    public function testRelease()
+    public function testRelease() : void
     {
         $task = $this->queue->release(0);
 
-        $this->assertTask($task, 0, States::READY, 'release_0');
+        self::assertTask($task, 0, States::READY, 'release_0');
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('ack_0')
      * @eval queue.tube['%tube_name%']:take()
      */
-    public function testAck()
+    public function testAck() : void
     {
         $task = $this->queue->ack(0);
 
-        $this->assertTask($task, 0, States::DONE, 'ack_0');
+        self::assertTask($task, 0, States::DONE, 'ack_0');
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('bury_0')
      */
-    public function testBury()
+    public function testBury() : void
     {
         $task = $this->queue->bury(0);
 
-        $this->assertTask($task, 0, States::BURIED, 'bury_0');
+        self::assertTask($task, 0, States::BURIED, 'bury_0');
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('kick_1')
      * @eval queue.tube['%tube_name%']:bury(0)
      */
-    public function testKickOne()
+    public function testKickOne() : void
     {
         $count = $this->queue->kick(1);
 
-        $this->assertSame(1, $count);
+        self::assertSame(1, $count);
     }
 
     /**
@@ -180,43 +184,43 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
      * @eval queue.tube['%tube_name%']:bury(1)
      * @eval queue.tube['%tube_name%']:bury(2)
      */
-    public function testKickMany()
+    public function testKickMany() : void
     {
         $count = $this->queue->kick(3);
 
-        $this->assertSame(3, $count);
+        self::assertSame(3, $count);
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('delete_0')
      */
-    public function testDelete()
+    public function testDelete() : void
     {
         $task = $this->queue->delete(0);
 
-        $this->assertTask($task, 0, States::DONE, 'delete_0');
+        self::assertTask($task, 0, States::DONE, 'delete_0');
     }
 
     /**
      * @eval queue.tube['%tube_name%']:put('truncate_0')
      * @eval queue.tube['%tube_name%']:put('truncate_1')
      */
-    public function testTruncate()
+    public function testTruncate() : void
     {
-        $this->assertSame(2, $this->queue->stats('tasks.total'));
+        self::assertSame(2, $this->queue->stats('tasks.total'));
 
         $this->queue->truncate();
 
-        $this->assertSame(0, $this->queue->stats('tasks.total'));
+        self::assertSame(0, $this->queue->stats('tasks.total'));
     }
 
-    public function testTruncateEmpty()
+    public function testTruncateEmpty() : void
     {
-        $this->assertSame(0, $this->queue->stats('tasks.total'));
+        self::assertSame(0, $this->queue->stats('tasks.total'));
 
         $this->queue->truncate();
 
-        $this->assertSame(0, $this->queue->stats('tasks.total'));
+        self::assertSame(0, $this->queue->stats('tasks.total'));
     }
 
     /**
@@ -235,11 +239,11 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
      * @eval queue.tube['%tube_name%']:kick(1)
      * @eval queue.tube['%tube_name%']:take(.001)
      */
-    public function testStats()
+    public function testStats() : void
     {
         $stats = $this->queue->stats();
 
-        $this->assertEquals([
+        self::assertEquals([
             'tasks' => [
                 'taken' => 1,
                 'buried' => 1,
@@ -264,11 +268,11 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         ], $stats, '', 0.0, 3, true);
     }
 
-    public function testEmptyStats()
+    public function testEmptyStats() : void
     {
         $stats = $this->queue->stats();
 
-        $this->assertEquals([
+        self::assertEquals([
             'tasks' => [
                 'taken' => 0,
                 'buried' => 0,
@@ -317,9 +321,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
      * @eval queue.tube['%tube_name%']:delete(8)
      * @eval queue.tube['%tube_name%']:take(.001)
      */
-    public function testStatsPath()
+    public function testStatsPath() : void
     {
-        $this->assertSameArray([
+        self::assertSameArray([
             'taken' => 1,
             'buried' => 2,
             'ready' => 3,
@@ -328,14 +332,14 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
             'total' => 6,
         ], $this->queue->stats('tasks'));
 
-        $this->assertSame(1, $this->queue->stats('tasks.taken'));
-        $this->assertSame(2, $this->queue->stats('tasks.buried'));
-        $this->assertSame(3, $this->queue->stats('tasks.ready'));
-        $this->assertSame(4, $this->queue->stats('tasks.done'));
-        $this->assertSame(0, $this->queue->stats('tasks.delayed'));
-        $this->assertSame(6, $this->queue->stats('tasks.total'));
+        self::assertSame(1, $this->queue->stats('tasks.taken'));
+        self::assertSame(2, $this->queue->stats('tasks.buried'));
+        self::assertSame(3, $this->queue->stats('tasks.ready'));
+        self::assertSame(4, $this->queue->stats('tasks.done'));
+        self::assertSame(0, $this->queue->stats('tasks.delayed'));
+        self::assertSame(6, $this->queue->stats('tasks.total'));
 
-        $this->assertSameArray([
+        self::assertSameArray([
             'ack' => 1,
             'delete' => 3,
             'take' => 3,
@@ -349,27 +353,28 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
             'ttl' => 0,
         ], $this->queue->stats('calls'));
 
-        $this->assertSame(1, $this->queue->stats('calls.ack'));
-        $this->assertSame(3, $this->queue->stats('calls.delete'));
-        $this->assertSame(3, $this->queue->stats('calls.take'));
-        $this->assertSame(1, $this->queue->stats('calls.kick'));
-        $this->assertSame(1, $this->queue->stats('calls.release'));
-        $this->assertSame(0, $this->queue->stats('calls.touch'));
-        $this->assertSame(10, $this->queue->stats('calls.put'));
-        $this->assertSame(3, $this->queue->stats('calls.bury'));
+        self::assertSame(1, $this->queue->stats('calls.ack'));
+        self::assertSame(3, $this->queue->stats('calls.delete'));
+        self::assertSame(3, $this->queue->stats('calls.take'));
+        self::assertSame(1, $this->queue->stats('calls.kick'));
+        self::assertSame(1, $this->queue->stats('calls.release'));
+        self::assertSame(0, $this->queue->stats('calls.touch'));
+        self::assertSame(10, $this->queue->stats('calls.put'));
+        self::assertSame(3, $this->queue->stats('calls.bury'));
     }
 
     /**
      * @dataProvider provideStatsInvalidPathData
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^Invalid path ".*?"\.$/
      */
-    public function testStatsInvalidPath($path)
+    public function testStatsInvalidPath($path) : void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/^Invalid path ".*?"\.$/');
+
         $this->queue->stats($path);
     }
 
-    public function provideStatsInvalidPathData()
+    public function provideStatsInvalidPathData() : iterable
     {
         return [
             [''],
@@ -387,23 +392,24 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @eval queue.tube['%tube_name%'].pow = function(self, base, exp) return math.pow(base, exp) end
      */
-    public function testCall()
+    public function testCall() : void
     {
-        $result = $this->queue->call('pow', [2, 8]);
+        $result = $this->queue->call('pow', 2, 8);
 
-        $this->assertSame(256, $result[0][0]);
+        self::assertSame(256, $result[0][0]);
     }
 
     /**
      * @dataProvider provideFailureCallbackData
-     * @expectedException \Exception
      */
-    public function testThrowException($methodName, array $args)
+    public function testThrowException(string $methodName, array $args) : void
     {
-        call_user_func_array([$this->queue, $methodName], $args);
+        $this->expectException(\Throwable::class);
+
+        $this->queue->$methodName(...$args);
     }
 
-    public function provideFailureCallbackData()
+    public function provideFailureCallbackData() : iterable
     {
         return [
             ['ack', [42]],
@@ -415,29 +421,32 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    protected function assertTaskInstance($task)
+    protected static function assertTaskInstance($task) : void
     {
-        $this->assertInstanceOf('Tarantool\Queue\Task', $task);
+        self::assertInstanceOf(Task::class, $task);
     }
 
-    protected function assertTask($task, $expectedId, $expectedState, $expectedData)
+    protected static function assertTask(Task $task, int $expectedId, string $expectedState, $expectedData) : void
     {
-        $this->assertTaskInstance($task);
-
-        $this->assertSame($expectedId, $task->getId());
-        $this->assertSame($expectedState, $task->getState());
-        $this->assertSame($expectedData, $task->getData());
+        self::assertSame($expectedId, $task->getId());
+        self::assertSame($expectedState, $task->getState());
+        self::assertSame($expectedData, $task->getData());
     }
 
-    protected function assertSameArray(array $expected, array $actual)
+    protected static function assertSameArray(array $expected, array $actual) : void
     {
         ksort($expected);
         ksort($actual);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
-    protected function getTubeType()
+    protected function getQueue() : Queue
+    {
+        return $this->queue;
+    }
+
+    protected function getTubeType() : string
     {
         $class = new \ReflectionClass($this);
         $type = str_replace('QueueTest', '', $class->getShortName());

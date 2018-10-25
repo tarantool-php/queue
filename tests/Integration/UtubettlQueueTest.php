@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Tarantool Queue package.
  *
@@ -11,7 +13,7 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
-class UtubettlQueueTest extends QueueTest
+final class UtubettlQueueTest extends QueueTest
 {
     use Ttl;
 }

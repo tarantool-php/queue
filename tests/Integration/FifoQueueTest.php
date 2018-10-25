@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Tarantool Queue package.
  *
@@ -11,6 +13,6 @@
 
 namespace Tarantool\Queue\Tests\Integration;
 
-class FifoQueueTest extends QueueTest
+final class FifoQueueTest extends QueueTest
 {
 }

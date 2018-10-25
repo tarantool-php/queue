@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Tarantool Queue package.
  *
@@ -11,29 +13,28 @@
 
 namespace Tarantool\Queue\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Tarantool\Queue\States;
 use Tarantool\Queue\Task;
 
-class TaskTest extends \PHPUnit_Framework_TestCase
+final class TaskTest extends TestCase
 {
     /**
      * @dataProvider provideTuples
      */
-    public function testCreateFromTuple(array $tuple)
+    public function testCreateFromTuple(array $tuple) : void
     {
         $task = Task::createFromTuple($tuple);
 
-        $this->assertSame($tuple[0], $task->getId());
-        $this->assertSame($tuple[1], $task->getState());
+        self::assertSame($tuple[0], $task->getId());
+        self::assertSame($tuple[1], $task->getState());
 
-        if (3 === count($tuple)) {
-            $this->assertSame($tuple[2], $task->getData());
+        if (3 === \count($tuple)) {
+            self::assertSame($tuple[2], $task->getData());
         }
-
-        return $task;
     }
 
-    public function provideTuples()
+    public function provideTuples() : iterable
     {
         return [
             [[0, States::READY, [42]]],
@@ -45,7 +46,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideStates
      */
-    public function testIsser($state)
+    public function testIsser(string $state) : void
     {
         static $map = [
             States::READY => 'isReady',
@@ -57,17 +58,17 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         $task = Task::createFromTuple([0, $state, null]);
 
-        $this->assertTrue($task->{$map[$state]}());
+        self::assertTrue($task->{$map[$state]}());
 
         $issers = $map;
         unset($issers[$state]);
 
         foreach ($issers as $isser) {
-            $this->assertFalse($task->$isser());
+            self::assertFalse($task->$isser());
         }
     }
 
-    public function provideStates()
+    public function provideStates() : iterable
     {
         return [
             [States::READY],

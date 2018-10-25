@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Tarantool Queue package.
  *
@@ -11,23 +13,23 @@
 
 namespace Tarantool\Queue\Tests\Unit;
 
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Tarantool\Client\Client;
 use Tarantool\Queue\Queue;
 
-class QueueTest extends \PHPUnit_Framework_TestCase
+final class QueueTest extends TestCase
 {
     /**
      * @dataProvider provideConstructorInvalidArgumentData
      */
-    public function testConstructorThrowsInvalidArgumentException($invalidClient, $type)
+    public function testConstructorThrowsInvalidArgumentException($invalidClient, string $type) : void
     {
         try {
             new Queue($invalidClient, 'foobar');
         } catch (\InvalidArgumentException $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e);
-            $this->assertSame(
-                "Tarantool\\Queue\\Queue::__construct() expects parameter 1 to be Tarantool or Tarantool\\Client\\Client, $type given.",
-                $e->getMessage()
-            );
+            self::assertContains('__construct() expects parameter 1 to be ', $e->getMessage());
+            self::assertStringEndsWith(", $type given.", $e->getMessage());
 
             return;
         }
@@ -35,7 +37,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
         $this->fail();
     }
 
-    public function provideConstructorInvalidArgumentData()
+    public function provideConstructorInvalidArgumentData() : iterable
     {
         return [
             [new \stdClass(), 'stdClass'],
@@ -43,15 +45,22 @@ class QueueTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetName() : void
     {
-        $client = $this->getMockBuilder('Tarantool\Client\Client')
-            ->disableOriginalConstructor()
-            ->getMock();
+        // temporary skip the test for the pecl connector until this PR is merged:
+        // https://github.com/tarantool/tarantool-php/pull/134
+        if (!class_exists(Client::class)) {
+            $this->markTestSkipped('The package "tarantool\client" is not installed.');
+        }
+
+        /** @var \Tarantool|Client|MockObject $client */
+        $client = class_exists(\Tarantool::class, false)
+            ? $this->createMock(\Tarantool::class)
+            : $this->createMock(Client::class);
 
         $queueName = uniqid('queue_', true);
         $queue = new Queue($client, $queueName);
 
-        $this->assertSame($queueName, $queue->getName());
+        self::assertSame($queueName, $queue->getName());
     }
 }
