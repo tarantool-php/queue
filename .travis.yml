@@ -9,7 +9,7 @@ env:
   - IMAGE='php:7.1-cli' TNT_CLIENT=pecl
   - IMAGE='php:7.1-cli' CHECK_CS=1
   - IMAGE='php:7.2-cli' PHPUNIT_OPTS='--coverage-clover=coverage.clover'
-  - IMAGE='php:7.3-rc-cli'
+  - IMAGE='php:7.3-cli'
 
 install:
   - ./dockerfile.sh | tee /dev/tty | docker build -t queue -
