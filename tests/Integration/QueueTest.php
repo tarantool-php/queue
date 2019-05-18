@@ -15,8 +15,6 @@ namespace Tarantool\Queue\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Tarantool\Client\Client;
-use Tarantool\Client\Connection\StreamConnection;
-use Tarantool\Client\Packer\PurePacker;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 use Tarantool\Queue\Task;
@@ -35,19 +33,12 @@ abstract class QueueTest extends TestCase
 
     public static function setUpBeforeClass() : void
     {
-        if (class_exists(\Tarantool::class, false)) {
-            self::$client = new \Tarantool(
-                getenv('TARANTOOL_HOST'),
-                (int) getenv('TARANTOOL_PORT')
-            );
+        $host = getenv('TARANTOOL_HOST');
+        $port = (int) getenv('TARANTOOL_PORT');
 
-            return;
-        }
-
-        $uri = sprintf('tcp://%s:%d', getenv('TARANTOOL_HOST'), getenv('TARANTOOL_PORT'));
-        $conn = new StreamConnection($uri);
-
-        self::$client = new Client($conn, new PurePacker());
+        self::$client = extension_loaded('tarantool')
+            ? new \Tarantool($host, $port)
+            : Client::fromDsn(sprintf('tcp://%s:%d', $host, $port));
     }
 
     public static function tearDownAfterClass() : void
@@ -63,12 +54,12 @@ abstract class QueueTest extends TestCase
         $tubeType = $this->getTubeType();
         $queueName = sprintf('t_%s_%s', $tubeType, $testName);
 
-        self::$client->evaluate('create_tube(...)', [$queueName, $tubeType]);
+        $this->evaluate('create_tube(...)', $queueName, $tubeType);
 
         $ann = $this->getAnnotations();
         if (!empty($ann['method']['eval'])) {
             foreach ($ann['method']['eval'] as $eval) {
-                self::$client->evaluate(str_replace('%tube_name%', $queueName, $eval));
+                $this->evaluate(str_replace('%tube_name%', $queueName, $eval));
             }
         }
 
@@ -396,7 +387,7 @@ abstract class QueueTest extends TestCase
     {
         $result = $this->queue->call('pow', 2, 8);
 
-        self::assertSame(256, $result[0][0]);
+        self::assertSame(256, $result[0]);
     }
 
     /**
@@ -452,5 +443,12 @@ abstract class QueueTest extends TestCase
         $type = str_replace('QueueTest', '', $class->getShortName());
 
         return strtolower($type);
+    }
+
+    final protected function evaluate(string $expr, ...$args) : array
+    {
+        return self::$client instanceof Client
+            ? self::$client->evaluate($expr, ...$args)
+            : self::$client->evaluate($expr, $args);
     }
 }

@@ -294,21 +294,22 @@ Then run Tarantool instance (needed for integration tests):
 
 ```bash
 docker network create tarantool-php
-docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue \
-    tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
+docker run -d --net=tarantool-php -p 3301:3301 --name=tarantool \
+    -v $(pwd)/tests/Integration/queues.lua:/queues.lua \
+    tarantool/tarantool:2 tarantool /queues.lua
 ```
 
 And then run both unit and integration tests:
 
 ```bash
-docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue queue
+docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue queue
 ```
 
 To run only integration or unit tests, set the `PHPUNIT_OPTS` environment variable
 to either `--testsuite integration` or `--testsuite unit` respectively, e.g.:
 
 ```bash
-docker run --rm --net=tarantool-php --name=queue -v `pwd`:/queue -w /queue \
+docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue \
     -e PHPUNIT_OPTS='--testsuite unit' queue
 ```
 

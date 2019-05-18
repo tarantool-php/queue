@@ -6,17 +6,17 @@ services:
   - docker
 
 env:
-  - IMAGE='php:7.1-cli' TNT_CLIENT=pecl
-  - IMAGE='php:7.1-cli' CHECK_CS=1
-  - IMAGE='php:7.2-cli' PHPUNIT_OPTS='--coverage-clover=coverage.clover'
-  - IMAGE='php:7.3-cli'
+  - PHP_IMAGE='php:7.1-cli' TNT_CLIENT=pecl
+  - PHP_IMAGE='php:7.1-cli' CHECK_CS=1
+  - PHP_IMAGE='php:7.2-cli' PHPUNIT_OPTS='--coverage-clover=coverage.clover'
+  - PHP_IMAGE='php:7.3-cli'
 
 install:
   - ./dockerfile.sh | tee /dev/tty | docker build -t queue -
 
 script:
   - docker network create tarantool-php
-  - docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue tarantool/tarantool:1 tarantool /queue/tests/Integration/queues.lua
+  - docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue tarantool/tarantool:2 tarantool /queue/tests/Integration/queues.lua
   - docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue -e PHPUNIT_OPTS="$PHPUNIT_OPTS" queue
 
 after_script:

@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Unit;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Tarantool\Client\Client;
 use Tarantool\Queue\Queue;
 
 final class QueueTest extends TestCase
@@ -43,24 +41,5 @@ final class QueueTest extends TestCase
             [new \stdClass(), 'stdClass'],
             [[], 'array'],
         ];
-    }
-
-    public function testGetName() : void
-    {
-        // temporary skip the test for the pecl connector until this PR is merged:
-        // https://github.com/tarantool/tarantool-php/pull/134
-        if (!class_exists(Client::class)) {
-            $this->markTestSkipped('The package "tarantool\client" is not installed.');
-        }
-
-        /** @var \Tarantool|Client|MockObject $client */
-        $client = class_exists(\Tarantool::class, false)
-            ? $this->createMock(\Tarantool::class)
-            : $this->createMock(Client::class);
-
-        $queueName = uniqid('queue_', true);
-        $queue = new Queue($client, $queueName);
-
-        self::assertSame($queueName, $queue->getName());
     }
 }
