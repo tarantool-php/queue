@@ -22,8 +22,17 @@ final class TarantoolAdapter
         $this->tarantool = $tarantool;
     }
 
-    public function call(string $funcName, ...$args) : array
+    public function call(string $funcName, ...$args)
     {
-        return $this->tarantool->call($funcName, $args);
+        $result = $this->tarantool->call($funcName, $args);
+
+        /*
+         * The $result can be one of the following:
+         *  1. An array of tuples, [[id, state, data], ...]
+         *  2. A scalar value, [[value]]
+         *  3. An empty array, []
+         */
+
+        return isset($result[0][1]) ? $result : ($result[0] ?? $result);
     }
 }
