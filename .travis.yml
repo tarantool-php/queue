@@ -6,7 +6,7 @@ services:
   - docker
 
 env:
-  - PHP_IMAGE='php:7.1-cli' TNT_CLIENT=pecl
+  - PHP_IMAGE='php:7.1-cli' TNT_CLIENT=pecl PHPUNIT_OPTS='--coverage-clover=coverage.clover'
   - PHP_IMAGE='php:7.1-cli' CHECK_CS=1
   - PHP_IMAGE='php:7.2-cli' PHPUNIT_OPTS='--coverage-clover=coverage.clover'
   - PHP_IMAGE='php:7.3-cli'
