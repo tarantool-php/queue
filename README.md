@@ -33,6 +33,10 @@ The recommended way to install the library is through [Composer](http://getcompo
 composer require tarantool/queue
 ```
 
+In addition, you will need to install one of the supported Tarantool connectors 
+(either [tarantool-php/client](https://github.com/tarantool-php/client) 
+or [tarantool/tarantool-php](https://github.com/tarantool/tarantool-php)).
+
 
 ## Before start
 
