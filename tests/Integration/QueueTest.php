@@ -21,6 +21,8 @@ use Tarantool\Queue\Task;
 
 abstract class QueueTest extends TestCase
 {
+    protected $queueName;
+
     /**
      * @var Queue
      */
@@ -63,12 +65,18 @@ abstract class QueueTest extends TestCase
             }
         }
 
+        $this->queueName = $queueName;
         $this->queue = new Queue(self::$client, $queueName);
     }
 
     protected function tearDown() : void
     {
         $this->queue = null;
+    }
+
+    public function testGetName() : void
+    {
+        self::assertSame($this->queueName, $this->queue->getName());
     }
 
     /**
