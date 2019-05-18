@@ -72,7 +72,7 @@ use Tarantool\Queue\Queue;
 $queue = new Queue($client, 'foobar');
 ```
 
-where `$client` is either an instance of the Tarantool class from the [pecl extension](https://github.com/tarantool/tarantool-php) 
+where `$client` is either an instance of the `Tarantool` class from the [pecl extension](https://github.com/tarantool/tarantool-php) 
 or an instance of `Tarantool\Client\Client` from the [pure PHP package](https://github.com/tarantool-php/client).
 
 

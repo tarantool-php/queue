@@ -1,8 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
-/*
+/**
  * This file is part of the Tarantool Queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
@@ -10,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
@@ -412,19 +412,19 @@ abstract class QueueTest extends TestCase
         ];
     }
 
-    protected static function assertTaskInstance($task) : void
+    final protected static function assertTaskInstance($task) : void
     {
         self::assertInstanceOf(Task::class, $task);
     }
 
-    protected static function assertTask(Task $task, int $expectedId, string $expectedState, $expectedData) : void
+    final protected static function assertTask(Task $task, int $expectedId, string $expectedState, $expectedData) : void
     {
         self::assertSame($expectedId, $task->getId());
         self::assertSame($expectedState, $task->getState());
         self::assertSame($expectedData, $task->getData());
     }
 
-    protected static function assertSameArray(array $expected, array $actual) : void
+    final protected static function assertSameArray(array $expected, array $actual) : void
     {
         ksort($expected);
         ksort($actual);
@@ -432,12 +432,12 @@ abstract class QueueTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    protected function getQueue() : Queue
+    final protected function getQueue() : Queue
     {
         return $this->queue;
     }
 
-    protected function getTubeType() : string
+    final protected function getTubeType() : string
     {
         $class = new \ReflectionClass($this);
         $type = str_replace('QueueTest', '', $class->getShortName());
