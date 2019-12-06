@@ -26,10 +26,7 @@ fi
 echo -e "
 FROM $PHP_IMAGE
 
-RUN apt-get update && \\
-    apt-get install -y curl git libzip-dev && \\
-    docker-php-ext-configure zip --with-libzip && \\
-    docker-php-ext-install zip${RUN_CMDS}
+RUN apt-get update && apt-get install -y curl git unzip${RUN_CMDS}
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
