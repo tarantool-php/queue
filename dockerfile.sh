@@ -16,7 +16,7 @@ if [[ $TNT_CLIENT == pecl ]]; then
 fi
 
 if [[ $PHPUNIT_OPTS =~ (^|[[:space:]])--coverage-[[:alpha:]] ]]; then
-    RUN_CMDS="$RUN_CMDS && \\\\\n    pecl install pcov && docker-php-ext-enable pcov"
+    RUN_CMDS="$RUN_CMDS && \\\\\n    pecl install xdebug && docker-php-ext-enable xdebug"
 fi
 
 if [[ "1" != "$CHECK_CS" ]]; then
