@@ -7,19 +7,19 @@ services:
 
 env:
   global:
-    TNT_IMAGE='tarantool/tarantool:2'
+    TNT_IMAGE='tarantool/tarantool:2.4'
 
   matrix:
     - PHP_IMAGE='php:7.1-cli'
     - PHP_IMAGE='php:7.2-cli'
-    - PHP_IMAGE='php:7.2-cli' TNT_CLIENT=pecl PHPUNIT_OPTS='--coverage-text --coverage-clover=coverage.clover'
-    - PHP_IMAGE='php:7.3-cli' CHECK_CS=1
-    - PHP_IMAGE='php:7.4-cli' PHPUNIT_OPTS='--coverage-text --coverage-clover=coverage.clover'
+    - PHP_IMAGE='php:7.3-cli' QA=1
+    - PHP_IMAGE='php:7.4-cli' COVERAGE_FILE='coverage.clover'
 
     - PHP_IMAGE='php:7.4-cli' TNT_IMAGE='tarantool/tarantool:1.7'
     - PHP_IMAGE='php:7.4-cli' TNT_IMAGE='tarantool/tarantool:1.9'
     - PHP_IMAGE='php:7.4-cli' TNT_IMAGE='tarantool/tarantool:1'
     - PHP_IMAGE='php:7.4-cli' TNT_IMAGE='tarantool/tarantool:2.1'
+    - PHP_IMAGE='php:7.4-cli' TNT_IMAGE='tarantool/tarantool:2.3'
 
 install:
   - ./dockerfile.sh | tee /dev/tty | docker build -t queue -
@@ -27,11 +27,14 @@ install:
 script:
   - docker network create tarantool-php
   - docker run --net=tarantool-php --rm ${TNT_IMAGE} /usr/local/bin/tarantool --version
-  - docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue ${TNT_IMAGE} tarantool /queue/tests/Integration/queues.lua
-  - docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue -e PHPUNIT_OPTS="$PHPUNIT_OPTS" queue
+  - docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue -e TNT_LISTEN_URI=$TNT_LISTEN_URI ${TNT_IMAGE} tarantool /queue/tests/Integration/queues.lua
+  - docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue queue
+  - if [[ -n "$QA" ]]; then
+      docker run --net=tarantool-php --rm -v $(pwd):/queue -w /queue queue php vendor/bin/php-cs-fixer fix --dry-run --diff --verbose .;
+    fi
 
 after_script:
-  - if [[ -f coverage.clover ]]; then
+  - if [[ -f "$COVERAGE_FILE" ]]; then
       curl -sSOL https://scrutinizer-ci.com/ocular.phar &&
-      docker run --rm -v $(pwd):/queue -w /queue queue php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
+      docker run --rm -v $(pwd):/queue -w /queue queue php ocular.phar code-coverage:upload --format=php-clover "$COVERAGE_FILE";
     fi

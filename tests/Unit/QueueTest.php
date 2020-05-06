@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Tarantool Queue package.
+ * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
  *
@@ -14,32 +14,26 @@ declare(strict_types=1);
 namespace Tarantool\Queue\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Tarantool\PhpUnit\Client\TestDoubleClient;
 use Tarantool\Queue\Queue;
 
 final class QueueTest extends TestCase
 {
-    /**
-     * @dataProvider provideConstructorInvalidArgumentData
-     */
-    public function testConstructorThrowsInvalidArgumentException($invalidClient, string $type) : void
+    use TestDoubleClient;
+
+    public function testGetName() : void
     {
-        try {
-            new Queue($invalidClient, 'foobar');
-        } catch (\InvalidArgumentException $e) {
-            self::assertContains('__construct() expects parameter 1 to be ', $e->getMessage());
-            self::assertStringEndsWith(", $type given.", $e->getMessage());
+        $queueName = 'foobar';
+        $queue = new Queue($this->createDummyClient(), $queueName);
 
-            return;
-        }
-
-        $this->fail();
+        self::assertSame($queueName, $queue->getName());
     }
 
-    public function provideConstructorInvalidArgumentData() : iterable
+    public function testGetClient() : void
     {
-        return [
-            [new \stdClass(), 'stdClass'],
-            [[], 'array'],
-        ];
+        $client = $this->createDummyClient();
+        $queue = new Queue($client, 'foobar');
+
+        self::assertSame($client, $queue->getClient());
     }
 }

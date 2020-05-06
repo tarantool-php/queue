@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Tarantool Queue package.
+ * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
  *
@@ -15,30 +15,20 @@ namespace Tarantool\Queue;
 
 use Tarantool\Client\Client;
 
-final class Queue
+class Queue
 {
     private $client;
     private $name;
 
-    /**
-     * @param \Tarantool|Client $client
-     * @param string $name
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($client, string $name)
+    public function __construct(Client $client, string $name)
     {
-        if ($client instanceof \Tarantool) {
-            $client = new TarantoolAdapter($client);
-        } elseif (!$client instanceof Client) {
-            throw new \InvalidArgumentException(\sprintf(
-                '%s() expects parameter 1 to be %s or Tarantool, %s given.',
-                __METHOD__, Client::class, \is_object($client) ? \get_class($client) : \gettype($client)
-            ));
-        }
-
         $this->client = $client;
         $this->name = $name;
+    }
+
+    public function getClient() : Client
+    {
+        return $this->client;
     }
 
     public function getName() : string
@@ -48,7 +38,7 @@ final class Queue
 
     public function put($data, array $options = []) : Task
     {
-        return Task::createFromTuple(
+        return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:put", $data, $options)[0]
         );
     }
@@ -57,40 +47,40 @@ final class Queue
     {
         $result = $this->client->call("queue.tube.$this->name:take", $timeout);
 
-        return empty($result[0]) ? null : Task::createFromTuple($result[0]);
+        return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
     public function touch(int $taskId, float $increment) : ?Task
     {
         $result = $this->client->call("queue.tube.$this->name:touch", $taskId, $increment);
 
-        return empty($result[0]) ? null : Task::createFromTuple($result[0]);
+        return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
     public function ack(int $taskId) : Task
     {
-        return Task::createFromTuple(
+        return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:ack", $taskId)[0]
         );
     }
 
     public function release(int $taskId, array $options = []) : Task
     {
-        return Task::createFromTuple(
+        return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:release", $taskId, $options)[0]
         );
     }
 
     public function peek(int $taskId) : Task
     {
-        return Task::createFromTuple(
+        return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:peek", $taskId)[0]
         );
     }
 
     public function bury(int $taskId) : Task
     {
-        return Task::createFromTuple(
+        return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:bury", $taskId)[0]
         );
     }
@@ -102,7 +92,7 @@ final class Queue
 
     public function delete(int $taskId) : Task
     {
-        return Task::createFromTuple(
+        return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:delete", $taskId)[0]
         );
     }
@@ -113,13 +103,11 @@ final class Queue
     }
 
     /**
-     * @param string|null $path
-     *
      * @throws \InvalidArgumentException
      *
      * @return array|int
      */
-    public function stats(string $path = null)
+    public function stats(?string $path = null)
     {
         [$stats] = $this->client->call('queue.stats', $this->name);
 
@@ -129,7 +117,7 @@ final class Queue
 
         foreach (\explode('.', $path) as $key) {
             if (!isset($stats[$key])) {
-                throw new \InvalidArgumentException(\sprintf('Invalid path "%s".', $path));
+                throw new \InvalidArgumentException(\sprintf('Invalid path "%s"', $path));
             }
             $stats = $stats[$key];
         }

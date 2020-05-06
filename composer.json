@@ -11,17 +11,13 @@
         }
     ],
     "require": {
-        "php": "^7.1"
+        "php": "^7.1",
+        "tarantool/client": "^0.7"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.14",
-        "phpunit/phpunit": "^7.4",
-        "rybakit/msgpack": "^0.6.0",
-        "tarantool/client": "^0.6.0"
-    },
-    "suggest": {
-        "ext-tarantool": "For using pecl extension",
-        "tarantool/client": "For using pure client"
+        "rybakit/msgpack": "^0.7",
+        "tarantool/phpunit-extras": "dev-master"
     },
     "autoload": {
         "psr-4": {

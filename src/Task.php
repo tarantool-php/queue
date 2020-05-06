@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Tarantool Queue package.
+ * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
  *
@@ -26,7 +26,7 @@ final class Task
         $this->data = $data;
     }
 
-    public static function createFromTuple(array $tuple) : self
+    public static function fromTuple(array $tuple) : self
     {
         [$id, $state, $data] = $tuple + [2 => null];
 

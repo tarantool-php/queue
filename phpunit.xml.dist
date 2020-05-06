@@ -11,8 +11,7 @@
         <ini name="display_startup_errors" value="On" />
         <ini name="error_reporting" value="E_ALL" />
 
-        <env name="TARANTOOL_HOST" value="127.0.0.1" />
-        <env name="TARANTOOL_PORT" value="3301" />
+        <env name="TNT_LISTEN_URI" value="3301" />
     </php>
 
     <testsuites>
@@ -30,4 +29,13 @@
             <directory>src</directory>
         </whitelist>
     </filter>
+
+<!--    <extensions>-->
+<!--&lt;!&ndash;        <extension class="Tarantool\PhpUnit\Annotation\AnnotationExtension">&ndash;&gt;-->
+<!--        <extension class="Tarantool\Queue\Tests\AnnotationExtension">-->
+<!--            <arguments>-->
+<!--                <string>tcp://%env(TARANTOOL_HOST)%:%env(TARANTOOL_PORT)%</string>-->
+<!--            </arguments>-->
+<!--        </extension>-->
+<!--    </extensions>-->
 </phpunit>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Tarantool Queue package.
+ * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
  *
@@ -13,74 +13,14 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
-use PHPUnit\Framework\TestCase;
-use Tarantool\Client\Client;
-use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
-use Tarantool\Queue\Task;
 
 abstract class QueueTest extends TestCase
 {
-    protected $queueName;
-
-    /**
-     * @var Queue
-     */
-    protected $queue;
-
-    /**
-     * @var \Tarantool|Client
-     */
-    private static $client;
-
-    public static function setUpBeforeClass() : void
-    {
-        $host = getenv('TARANTOOL_HOST');
-        $port = (int) getenv('TARANTOOL_PORT');
-
-        self::$client = extension_loaded('tarantool')
-            ? new \Tarantool($host, $port)
-            : Client::fromDsn(sprintf('tcp://%s:%d', $host, $port));
-    }
-
-    public static function tearDownAfterClass() : void
-    {
-        self::$client = null;
-    }
-
-    protected function setUp() : void
-    {
-        $testName = preg_replace('/^test(\S+).*$/', '\1', $this->getName());
-        $testName = strtolower($testName);
-
-        $tubeType = $this->getTubeType();
-        $queueName = sprintf('t_%s_%s', $tubeType, $testName);
-
-        $this->evaluate('create_tube(...)', $queueName, $tubeType);
-
-        $ann = $this->getAnnotations();
-        if (!empty($ann['method']['eval'])) {
-            foreach ($ann['method']['eval'] as $eval) {
-                $this->evaluate(str_replace('%tube_name%', $queueName, $eval));
-            }
-        }
-
-        $this->queueName = $queueName;
-        $this->queue = new Queue(self::$client, $queueName);
-    }
-
-    protected function tearDown() : void
-    {
-        $this->queue = null;
-    }
-
-    public function testGetName() : void
-    {
-        self::assertSame($this->queueName, $this->queue->getName());
-    }
-
     /**
      * @dataProvider provideTaskData
+     *
+     * @param mixed $data
      */
     public function testPut($data) : void
     {
@@ -104,7 +44,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('peek_0')
+     * @lua tube:put('peek_0')
      */
     public function testPeek() : void
     {
@@ -114,7 +54,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('take')
+     * @lua tube:put('take')
      */
     public function testTake() : void
     {
@@ -133,8 +73,8 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('release_0')
-     * @eval queue.tube['%tube_name%']:take()
+     * @lua tube:put('release_0')
+     * @lua tube:take()
      */
     public function testRelease() : void
     {
@@ -144,8 +84,8 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('ack_0')
-     * @eval queue.tube['%tube_name%']:take()
+     * @lua tube:put('ack_0')
+     * @lua tube:take()
      */
     public function testAck() : void
     {
@@ -155,7 +95,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('bury_0')
+     * @lua tube:put('bury_0')
      */
     public function testBury() : void
     {
@@ -165,8 +105,8 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('kick_1')
-     * @eval queue.tube['%tube_name%']:bury(0)
+     * @lua tube:put('kick_1')
+     * @lua tube:bury(0)
      */
     public function testKickOne() : void
     {
@@ -176,12 +116,12 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('kick_1')
-     * @eval queue.tube['%tube_name%']:put('kick_2')
-     * @eval queue.tube['%tube_name%']:put('kick_3')
-     * @eval queue.tube['%tube_name%']:bury(0)
-     * @eval queue.tube['%tube_name%']:bury(1)
-     * @eval queue.tube['%tube_name%']:bury(2)
+     * @lua tube:put('kick_1')
+     * @lua tube:put('kick_2')
+     * @lua tube:put('kick_3')
+     * @lua tube:bury(0)
+     * @lua tube:bury(1)
+     * @lua tube:bury(2)
      */
     public function testKickMany() : void
     {
@@ -191,7 +131,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('delete_0')
+     * @lua tube:put('delete_0')
      */
     public function testDelete() : void
     {
@@ -201,8 +141,8 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('truncate_0')
-     * @eval queue.tube['%tube_name%']:put('truncate_1')
+     * @lua tube:put('truncate_0')
+     * @lua tube:put('truncate_1')
      */
     public function testTruncate() : void
     {
@@ -223,20 +163,20 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('stat_0')
-     * @eval queue.tube['%tube_name%']:put('stat_1')
-     * @eval queue.tube['%tube_name%']:put('stat_2')
-     * @eval queue.tube['%tube_name%']:put('stat_3')
-     * @eval queue.tube['%tube_name%']:put('stat_4')
-     * @eval queue.tube['%tube_name%']:delete(4)
-     * @eval queue.tube['%tube_name%']:take(.001)
-     * @eval queue.tube['%tube_name%']:release(0)
-     * @eval queue.tube['%tube_name%']:take(.001)
-     * @eval queue.tube['%tube_name%']:ack(0)
-     * @eval queue.tube['%tube_name%']:bury(1)
-     * @eval queue.tube['%tube_name%']:bury(2)
-     * @eval queue.tube['%tube_name%']:kick(1)
-     * @eval queue.tube['%tube_name%']:take(.001)
+     * @lua tube:put('stat_0')
+     * @lua tube:put('stat_1')
+     * @lua tube:put('stat_2')
+     * @lua tube:put('stat_3')
+     * @lua tube:put('stat_4')
+     * @lua tube:delete(4)
+     * @lua tube:take(.001)
+     * @lua tube:release(0)
+     * @lua tube:take(.001)
+     * @lua tube:ack(0)
+     * @lua tube:bury(1)
+     * @lua tube:bury(2)
+     * @lua tube:kick(1)
+     * @lua tube:take(.001)
      */
     public function testStats() : void
     {
@@ -264,7 +204,7 @@ abstract class QueueTest extends TestCase
                 'delay' => 0,
                 'ttl' => 0,
             ],
-        ], $stats, '', 0.0, 3, true);
+        ], $stats);
     }
 
     public function testEmptyStats() : void
@@ -297,28 +237,28 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%']:put('stat_0')
-     * @eval queue.tube['%tube_name%']:put('stat_1')
-     * @eval queue.tube['%tube_name%']:put('stat_2')
-     * @eval queue.tube['%tube_name%']:put('stat_3')
-     * @eval queue.tube['%tube_name%']:put('stat_4')
-     * @eval queue.tube['%tube_name%']:put('stat_5')
-     * @eval queue.tube['%tube_name%']:put('stat_6')
-     * @eval queue.tube['%tube_name%']:put('stat_7')
-     * @eval queue.tube['%tube_name%']:put('stat_8')
-     * @eval queue.tube['%tube_name%']:put('stat_9')
-     * @eval queue.tube['%tube_name%']:take(.001)
-     * @eval queue.tube['%tube_name%']:release(0)
-     * @eval queue.tube['%tube_name%']:take(.001)
-     * @eval queue.tube['%tube_name%']:ack(0)
-     * @eval queue.tube['%tube_name%']:bury(1)
-     * @eval queue.tube['%tube_name%']:bury(2)
-     * @eval queue.tube['%tube_name%']:bury(3)
-     * @eval queue.tube['%tube_name%']:kick(1)
-     * @eval queue.tube['%tube_name%']:delete(6)
-     * @eval queue.tube['%tube_name%']:delete(7)
-     * @eval queue.tube['%tube_name%']:delete(8)
-     * @eval queue.tube['%tube_name%']:take(.001)
+     * @lua tube:put('stat_0')
+     * @lua tube:put('stat_1')
+     * @lua tube:put('stat_2')
+     * @lua tube:put('stat_3')
+     * @lua tube:put('stat_4')
+     * @lua tube:put('stat_5')
+     * @lua tube:put('stat_6')
+     * @lua tube:put('stat_7')
+     * @lua tube:put('stat_8')
+     * @lua tube:put('stat_9')
+     * @lua tube:take(.001)
+     * @lua tube:release(0)
+     * @lua tube:take(.001)
+     * @lua tube:ack(0)
+     * @lua tube:bury(1)
+     * @lua tube:bury(2)
+     * @lua tube:bury(3)
+     * @lua tube:kick(1)
+     * @lua tube:delete(6)
+     * @lua tube:delete(7)
+     * @lua tube:delete(8)
+     * @lua tube:take(.001)
      */
     public function testStatsPath() : void
     {
@@ -365,10 +305,10 @@ abstract class QueueTest extends TestCase
     /**
      * @dataProvider provideStatsInvalidPathData
      */
-    public function testStatsInvalidPath($path) : void
+    public function testStatsInvalidPath(?string $path) : void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/^Invalid path ".*?"\.$/');
+        $this->expectExceptionMessageMatches('/^Invalid path ".*?"$/');
 
         $this->queue->stats($path);
     }
@@ -389,7 +329,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
-     * @eval queue.tube['%tube_name%'].pow = function(self, base, exp) return math.pow(base, exp) end
+     * @lua tube.pow = function(self, base, exp) return math.pow(base, exp) end
      */
     public function testCall() : void
     {
@@ -418,45 +358,5 @@ abstract class QueueTest extends TestCase
             ['kick', ['foo']],
             ['delete', [42]],
         ];
-    }
-
-    final protected static function assertTaskInstance($task) : void
-    {
-        self::assertInstanceOf(Task::class, $task);
-    }
-
-    final protected static function assertTask(Task $task, int $expectedId, string $expectedState, $expectedData) : void
-    {
-        self::assertSame($expectedId, $task->getId());
-        self::assertSame($expectedState, $task->getState());
-        self::assertSame($expectedData, $task->getData());
-    }
-
-    final protected static function assertSameArray(array $expected, array $actual) : void
-    {
-        ksort($expected);
-        ksort($actual);
-
-        self::assertSame($expected, $actual);
-    }
-
-    final protected function getQueue() : Queue
-    {
-        return $this->queue;
-    }
-
-    final protected function getTubeType() : string
-    {
-        $class = new \ReflectionClass($this);
-        $type = str_replace('QueueTest', '', $class->getShortName());
-
-        return strtolower($type);
-    }
-
-    final protected function evaluate(string $expr, ...$args) : array
-    {
-        return self::$client instanceof Client
-            ? self::$client->evaluate($expr, ...$args)
-            : self::$client->evaluate($expr, $args);
     }
 }

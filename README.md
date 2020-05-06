@@ -22,7 +22,7 @@ Lua modules, called [LuaRocks](https://luarocks.org/). This package provides PHP
    * [Consumer API](#consumer-api)
    * [Statistics](#statistics)
    * [Custom methods](#custom-methods)
- * [Tests](#tests)
+ * [Testing](#testing)
  * [License](#license)
 
 
@@ -34,10 +34,6 @@ The recommended way to install the library is through [Composer](http://getcompo
 composer require tarantool/queue
 ```
 
-In addition, you will need to install one of the supported Tarantool connectors 
-(either [tarantool-php/client](https://github.com/tarantool-php/client) 
-or [tarantool/tarantool-php](https://github.com/tarantool/tarantool-php)).
-
 
 ## Before start
 
@@ -47,14 +43,14 @@ is configured, up and running. The minimal required configuration might look lik
 ```lua
 -- queues.lua
 
-box.cfg {listen=3301}
+box.cfg {listen = 3301}
 
 queue = require('queue')
-queue.create_tube('foobar', 'fifottl', {if_not_exists=true})
+queue.create_tube('foobar', 'fifottl', {if_not_exists = true})
 ```
 
-> *You can read more about the box configuration in the official [Tarantool documentation](http://tarantool.org/doc/book/configuration/index.html#initialization-file).
-> For more information about the queue configuration check out [queue's README](https://github.com/tarantool/queue/blob/master/README.md).*
+> *You can read more about the box configuration in the official Tarantool [documentation](http://tarantool.org/doc/book/configuration/index.html#initialization-file).
+> More information on queue configuration can be found [here](https://github.com/tarantool/queue/blob/master/README.md).*
 
 To start the instance you need to copy (or symlink) `queues.lua` file into the `/etc/tarantool/instances.enabled`
 directory and run the following command:
@@ -77,8 +73,7 @@ use Tarantool\Queue\Queue;
 $queue = new Queue($client, 'foobar');
 ```
 
-where `$client` is either an instance of the `Tarantool` class from the [pecl extension](https://github.com/tarantool/tarantool-php) 
-or an instance of `Tarantool\Client\Client` from the [pure PHP package](https://github.com/tarantool-php/client).
+where `$client` is an instance of `Tarantool\Client\Client` from the [tarantool/client](https://github.com/tarantool-php/client) package.
 
 
 ### Data types
@@ -96,13 +91,13 @@ $queue->put(['foo' => ['bar' => ['baz' => null]]]);
 $queue->put(new MyObject());
 ```
 
-> *Object serialization is only supported when [tarantool/client](https://github.com/tarantool-php/client) is used.*
+> *To learn more about object serialization, please follow this [link](https://github.com/tarantool-php/client#user-defined-types).*
 
 
 ### Tasks
 
-Most of the [Queue API](src/Queue.php) methods return back
-a [Task](src/Task.php) object containing the following getters:
+Most of the [Queue API](src/Queue.php) methods return a [Task](src/Task.php) object
+containing the following getters:
 
 ```php
 Task::getId()
@@ -212,7 +207,7 @@ $queue->truncate();
 
 > *For a detailed API documentation, please read the section 
 > "[Using the queue module](https://github.com/tarantool/queue#using-the-queue-module)" 
-> of the [queue's README](https://github.com/tarantool/queue/blob/master/README.md).*
+> of the queue README.*
 
 
 ### Statistics
@@ -255,9 +250,9 @@ $total = $queue->stats('tasks.total');
 
 ### Custom methods
 
-Thanks to flexible nature of the [tarantool/queue](https://github.com/tarantool/queue/) module, 
-you can easily create your own queue drivers or extend existing ones with an additional functionality. 
-For example, you added the `put_many` method to your `foobar` queue, which inserts multiple tasks in a transaction:  
+Thanks to flexible nature of the [queue](https://github.com/tarantool/queue/) Lua module, you can easily create
+your own queue drivers or extend existing ones with an additional functionality. For example, suppose you added
+the `put_many` method to your `foobar` queue, which inserts multiple tasks atomically:
 
 ```lua
 -- queues.lua
@@ -277,7 +272,7 @@ queue.tube.foobar.put_many = function(self, items)
 end
 ```
 
-To call this method on a `$queue` object, use `Queue::call()`:
+To invoke this method from php, use `Queue::call()`:
 
 ```php
 $result = $queue->call('put_many', [
@@ -287,7 +282,7 @@ $result = $queue->call('put_many', [
 ```
 
 
-## Tests
+## Testing
 
 The easiest way to run tests is with Docker. First, build an image using the [dockerfile.sh](dockerfile.sh) generator:
 
@@ -295,7 +290,7 @@ The easiest way to run tests is with Docker. First, build an image using the [do
 ./dockerfile.sh | docker build -t queue -
 ```
 
-Then run Tarantool instance (needed for integration tests):
+Then run a Tarantool instance (needed for integration tests):
 
 ```bash
 docker network create tarantool-php

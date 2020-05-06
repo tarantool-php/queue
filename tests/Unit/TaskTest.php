@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Tarantool Queue package.
+ * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
  *
@@ -24,7 +24,7 @@ final class TaskTest extends TestCase
      */
     public function testCreateFromTuple(array $tuple) : void
     {
-        $task = Task::createFromTuple($tuple);
+        $task = Task::fromTuple($tuple);
 
         self::assertSame($tuple[0], $task->getId());
         self::assertSame($tuple[1], $task->getState());
@@ -56,7 +56,7 @@ final class TaskTest extends TestCase
             States::DELAYED => 'isDelayed',
         ];
 
-        $task = Task::createFromTuple([0, $state, null]);
+        $task = Task::fromTuple([0, $state, null]);
 
         self::assertTrue($task->{$map[$state]}());
 

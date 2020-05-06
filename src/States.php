@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Tarantool Queue package.
+ * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
  *
@@ -20,4 +20,8 @@ final class States
     public const DONE = '-';
     public const BURIED = '!';
     public const DELAYED = '~';
+
+    private function __construct()
+    {
+    }
 }
