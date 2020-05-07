@@ -111,12 +111,4 @@ abstract class TestCase extends BaseTestCase
         self::assertSame($expectedState, $task->getState());
         self::assertSame($expectedData, $task->getData());
     }
-
-    final protected static function assertSameArray(array $expected, array $actual) : void
-    {
-        ksort($expected);
-        ksort($actual);
-
-        self::assertSame($expected, $actual);
-    }
 }

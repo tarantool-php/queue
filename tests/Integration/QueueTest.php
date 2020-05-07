@@ -262,7 +262,7 @@ abstract class QueueTest extends TestCase
      */
     public function testStatsPath() : void
     {
-        self::assertSameArray([
+        self::assertEquals([
             'taken' => 1,
             'buried' => 2,
             'ready' => 3,
@@ -278,7 +278,7 @@ abstract class QueueTest extends TestCase
         self::assertSame(0, $this->queue->stats('tasks.delayed'));
         self::assertSame(6, $this->queue->stats('tasks.total'));
 
-        self::assertSameArray([
+        self::assertEquals([
             'ack' => 1,
             'delete' => 3,
             'take' => 3,
