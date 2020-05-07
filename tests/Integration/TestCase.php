@@ -41,12 +41,14 @@ abstract class TestCase extends BaseTestCase
             return $this->client = Client::fromDefaults();
         }
 
-        if (0 === strpos($uri, '/') || 0 === strpos($uri, 'unix/:')) {
+        if (0 === strpos($uri, '/')) {
+            $dsn = 'unix://'.$uri;
+        } elseif (0 === strpos($uri, 'unix/:')) {
             $dsn = 'unix://'.substr($uri, 6);
         } elseif (ctype_digit($uri)) {
-            $dsn = "tcp://127.0.0.1:$uri";
+            $dsn = 'tcp://127.0.0.1:'.$uri;
         } else {
-            $dsn = "tcp://$uri";
+            $dsn = 'tcp://'.$uri;
         }
 
         return $this->client = Client::fromDsn($dsn);
