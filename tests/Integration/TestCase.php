@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use PHPUnitExtras\Annotation\AnnotationProcessorBuilder;
 use Tarantool\Client\Client;
-use Tarantool\PhpUnit\Annotation\Annotations;
+use Tarantool\PhpUnit\TestCase as BaseTestCase;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\Task;
 use Tarantool\Queue\Tests\PhpUnitCompat;
 
 abstract class TestCase extends BaseTestCase
 {
-    use Annotations;
     use PhpUnitCompat;
 
     /** @var Client|null */
@@ -30,6 +29,24 @@ abstract class TestCase extends BaseTestCase
 
     /** @var Queue */
     protected $queue;
+
+    public function getQueueName() : string
+    {
+        $methodName = $this->getName(false);
+        if (0 === strpos($methodName, 'test')) {
+            $methodName = substr($methodName, 4);
+        }
+
+        return sprintf('t_%s_%s', $this->getQueueType(), strtolower($methodName));
+    }
+
+    public function getQueueType() : string
+    {
+        $class = new \ReflectionClass($this);
+        $type = str_replace('QueueTest', '', $class->getShortName());
+
+        return strtolower($type);
+    }
 
     final protected function getClient() : Client
     {
@@ -54,52 +71,23 @@ abstract class TestCase extends BaseTestCase
         return $this->client = Client::fromDsn($dsn);
     }
 
+    final protected function createAnnotationProcessorBuilder() : AnnotationProcessorBuilder
+    {
+        return parent::createAnnotationProcessorBuilder()
+            ->addPlaceholderResolver(new TubePlaceholderResolver($this));
+    }
+
     /**
      * @before
      */
     final protected function initQueue() : void
     {
-        $queueName = $this->getQueueName();
-        $client = $this->getClient();
-        $this->queue = new Queue($client, $queueName);
-
-        $client->evaluate(sprintf(
-            "tube = create_tube('%s', '%s')",
-            $queueName,
-            $this->getQueueType()
-        ));
-
-        $this->processAnnotations(static::class, $this->getName(false) ?? '');
-    }
-
-    /**
-     * @after
-     */
-    final protected function destroyQueue() : void
-    {
-        $this->getClient()->evaluate('tube = nil');
-        $this->queue = null;
+        $this->queue = new Queue($this->getClient(), $this->getQueueName());
     }
 
     final protected function getQueue() : Queue
     {
         return $this->queue;
-    }
-
-    protected function getQueueName() : string
-    {
-        $testName = preg_replace('/^test(\S+).*$/', '\1', $this->getName());
-        $testName = strtolower($testName);
-
-        return sprintf('t_%s_%s', $this->getQueueType(), $testName);
-    }
-
-    protected function getQueueType() : string
-    {
-        $class = new \ReflectionClass($this);
-        $type = str_replace('QueueTest', '', $class->getShortName());
-
-        return strtolower($type);
     }
 
     final protected static function assertTaskInstance($task) : void

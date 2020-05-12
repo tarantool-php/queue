@@ -19,6 +19,7 @@ abstract class QueueTest extends TestCase
 {
     /**
      * @dataProvider provideTaskData
+     * @lua create_tube('%tube_name%', '%tube_type%')
      *
      * @param mixed $data
      */
@@ -44,6 +45,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('peek_0')
      */
     public function testPeek() : void
@@ -54,6 +56,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('take')
      */
     public function testTake() : void
@@ -63,6 +66,9 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::TAKEN, 'take');
     }
 
+    /**
+     * @lua create_tube('%tube_name%', '%tube_type%')
+     */
     public function testTakeNone() : void
     {
         $time = time();
@@ -73,6 +79,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('release_0')
      * @lua tube:take()
      */
@@ -84,6 +91,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('ack_0')
      * @lua tube:take()
      */
@@ -95,6 +103,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('bury_0')
      */
     public function testBury() : void
@@ -105,6 +114,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('kick_1')
      * @lua tube:bury(0)
      */
@@ -116,6 +126,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('kick_1')
      * @lua tube:put('kick_2')
      * @lua tube:put('kick_3')
@@ -131,6 +142,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('delete_0')
      */
     public function testDelete() : void
@@ -141,6 +153,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('truncate_0')
      * @lua tube:put('truncate_1')
      */
@@ -153,6 +166,9 @@ abstract class QueueTest extends TestCase
         self::assertSame(0, $this->queue->stats('tasks.total'));
     }
 
+    /**
+     * @lua create_tube('%tube_name%', '%tube_type%')
+     */
     public function testTruncateEmpty() : void
     {
         self::assertSame(0, $this->queue->stats('tasks.total'));
@@ -163,6 +179,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('stat_0')
      * @lua tube:put('stat_1')
      * @lua tube:put('stat_2')
@@ -207,6 +224,9 @@ abstract class QueueTest extends TestCase
         ], $stats);
     }
 
+    /**
+     * @lua create_tube('%tube_name%', '%tube_type%')
+     */
     public function testEmptyStats() : void
     {
         $stats = $this->queue->stats();
@@ -237,6 +257,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('stat_0')
      * @lua tube:put('stat_1')
      * @lua tube:put('stat_2')
@@ -304,6 +325,7 @@ abstract class QueueTest extends TestCase
 
     /**
      * @dataProvider provideStatsInvalidPathData
+     * @lua create_tube('%tube_name%', '%tube_type%')
      */
     public function testStatsInvalidPath(?string $path) : void
     {
@@ -329,6 +351,7 @@ abstract class QueueTest extends TestCase
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube.pow = function(self, base, exp) return math.pow(base, exp) end
      */
     public function testCall() : void

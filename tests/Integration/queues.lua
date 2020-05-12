@@ -13,10 +13,14 @@ box.schema.user.grant('guest', 'read,write,execute,create,drop,alter', 'universe
 
 queue = require('queue')
 
-function create_tube(tube_name, tube_type, opts)
-    if queue.tube[tube_name] then
-        queue.tube[tube_name]:drop()
+function try_drop_tube(name)
+    if queue.tube[name] then
+        queue.tube[name]:drop()
     end
-
-    return queue.create_tube(tube_name, tube_type, opts)
 end
+
+function create_tube(name, type, opts)
+    try_drop_tube(name)
+    return queue.create_tube(name, type, opts)
+end
+

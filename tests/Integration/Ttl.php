@@ -19,6 +19,7 @@ use Tarantool\Queue\States;
 trait Ttl
 {
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('ttr_1', {ttr = 1})
      */
     public function testTimeToRun() : void
@@ -35,6 +36,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('ttl_1', {ttl = 1})
      */
     public function testTimeToLive() : void
@@ -46,6 +48,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('touch_ttr_1', {ttr = 1})
      */
     public function testTouchTimeToRun() : void
@@ -64,6 +67,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('touch_ttl_1', {ttl = 1})
      */
     public function testTouchTimeToLive() : void
@@ -83,6 +87,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('touch_invalid_interval')
      */
     public function testTouchInvalidInterval() : void
@@ -96,6 +101,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('pri_low', {pri = 2})
      * @lua tube:put('pri_high', {pri = 1})
      */
@@ -114,6 +120,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('delay_1', {delay = 1})
      */
     public function testDelay() : void
@@ -130,6 +137,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('release_0')
      * @lua tube:take()
      */
@@ -149,6 +157,7 @@ trait Ttl
     }
 
     /**
+     * @lua tube = create_tube('%tube_name%', '%tube_type%')
      * @lua tube:put('stat_delayed_0', {delay = 9999})
      * @lua tube:put('stat_delayed_1', {delay = 9999})
      */
