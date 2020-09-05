@@ -95,8 +95,9 @@ abstract class TestCase extends BaseTestCase
         self::assertInstanceOf(Task::class, $task);
     }
 
-    final protected static function assertTask(Task $task, int $expectedId, string $expectedState, $expectedData) : void
+    final protected static function assertTask($task, int $expectedId, string $expectedState, $expectedData) : void
     {
+        self::assertTaskInstance($task);
         self::assertSame($expectedId, $task->getId());
         self::assertSame($expectedState, $task->getState());
         self::assertSame($expectedData, $task->getData());
