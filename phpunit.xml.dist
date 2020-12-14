@@ -29,13 +29,4 @@
             <directory>src</directory>
         </whitelist>
     </filter>
-
-<!--    <extensions>-->
-<!--&lt;!&ndash;        <extension class="Tarantool\PhpUnit\Annotation\AnnotationExtension">&ndash;&gt;-->
-<!--        <extension class="Tarantool\Queue\Tests\AnnotationExtension">-->
-<!--            <arguments>-->
-<!--                <string>tcp://%env(TARANTOOL_HOST)%:%env(TARANTOOL_PORT)%</string>-->
-<!--            </arguments>-->
-<!--        </extension>-->
-<!--    </extensions>-->
 </phpunit>
