@@ -36,6 +36,9 @@ class Queue
         return $this->name;
     }
 
+    /**
+     * @param mixed $data
+     */
     public function put($data, array $options = []) : Task
     {
         return Task::fromTuple(
@@ -125,6 +128,9 @@ class Queue
         return $stats;
     }
 
+    /**
+     * @param mixed ...$args
+     */
     public function call(string $methodName, ...$args) : array
     {
         return $this->client->call("queue.tube.$this->name:$methodName", ...$args);
