@@ -18,7 +18,7 @@ final class Task
     private $id;
     private $state;
 
-    /** @var mixed $data */
+    /** @var mixed */
     private $data;
 
     /**
