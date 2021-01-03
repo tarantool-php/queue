@@ -1,6 +1,6 @@
 # Tarantool Queue
 
-[![Build Status](https://travis-ci.com/tarantool-php/queue.svg?branch=master)](https://travis-ci.com/tarantool-php/queue)
+[![Quality Assurance](https://github.com/tarantool-php/queue/workflows/QA/badge.svg)](https://github.com/tarantool-php/queue/actions?query=workflow%3AQA)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tarantool-php/queue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tarantool-php/queue/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/tarantool-php/queue/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/tarantool-php/queue/?branch=master)
 [![Mentioned in Awesome PHP](https://awesome.re/mentioned-badge.svg)](https://github.com/ziadoz/awesome-php)
