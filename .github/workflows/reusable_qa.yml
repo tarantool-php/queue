@@ -1,0 +1,45 @@
+name: reusable_qa
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: The name of the tarantool build artifact
+        default: ubuntu-focal
+        required: false
+        type: string
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone the tarantool-php/queue connector
+        uses: actions/checkout@v2
+        with:
+          repository: tarantool-php/queue
+
+      - name: Download the tarantool build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifact_name }}
+
+      - name: Install tarantool
+        # Now we're lucky: all dependencies are already installed. Check package
+        # dependencies when migrating to other OS version.
+        run: sudo dpkg -i tarantool*.deb
+
+      - name: Install the tarantool/queue module
+        run: tarantoolctl rocks install queue
+
+      - name: Build docker image with connector setup
+        run: ./dockerfile.sh | tee /dev/tty | docker build -t queue -
+        env:
+          TNT_LISTEN_URI: localhost:3301
+
+      - name: Run tarantool
+        run: tarantool ./tests/Integration/queues.lua > tarantool.log 2>&1 &
+        env:
+          TNT_LISTEN_URI: localhost:3301
+
+      - name: Run connector tests from docker container
+        run: docker run --rm --network=host -v $PWD:/queue -w /queue queue
