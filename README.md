@@ -310,7 +310,7 @@ you can pass additional arguments and options to the `phpunit` command.
 For example, to run only unit tests, execute:
 
 ```bash
-docker run --rm --net=tarantool-php -v $(pwd):/queue -w /queue \
+docker run --rm --net=tarantool-php -v $(pwd):/queue -w /queue queue \
     vendor/bin/phpunit --testsuite=unit
 ```
 
