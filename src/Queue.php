@@ -39,11 +39,10 @@ class Queue
     /**
      * @param mixed $data
      */
-    public function put($data, array $options = []) : Task
+    public function put($data, array $options = []) : ?Task
     {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:put", $data, $options)[0]
-        );
+        $result = $this->client->call("queue.tube.$this->name:put", $data, $options);
+        return is_null($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
     public function take(float $timeout = null) : ?Task
