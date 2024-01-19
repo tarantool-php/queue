@@ -28,8 +28,14 @@ jobs:
         # dependencies when migrating to other OS version.
         run: sudo dpkg -i tarantool*.deb
 
+      - name: Setup tt
+        run: |
+          curl -L https://tarantool.io/release/2/installer.sh | sudo bash
+          sudo apt install -y tt
+          tt version
+
       - name: Install the tarantool/queue module
-        run: tarantoolctl rocks install queue
+        run: tt rocks install queue
 
       - name: Build docker image with connector setup
         run: ./dockerfile.sh | tee /dev/tty | docker build -t queue -
