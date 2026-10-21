@@ -48,6 +48,20 @@ abstract class TestCase extends BaseTestCase
         return strtolower($type);
     }
 
+    public function getSubqueue() : ?string
+    {
+        return null;
+    }
+
+    final protected function withSubqueue(array $opts = []) : array
+    {
+        if (null !== $subqueue = $this->getSubqueue()) {
+            $opts['subqueue'] = $subqueue;
+	 }
+
+        return $opts;
+    }
+
     final protected function getClient() : Client
     {
         if ($this->client) {

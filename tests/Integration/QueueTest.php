@@ -25,7 +25,7 @@ abstract class QueueTest extends TestCase
      */
     public function testPut($data) : void
     {
-        $task = $this->queue->put($data);
+        $task = $this->queue->put($data, $this->withSubqueue());
 
         self::assertTask($task, 0, States::READY, $data);
     }
@@ -46,22 +46,22 @@ abstract class QueueTest extends TestCase
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('peek_0')
+     * @lua tube:put('peek_0', {subqueue = %subqueue%})
      */
     public function testPeek() : void
     {
-        $task = $this->queue->peek(0);
+        $task = $this->queue->peek(0, $this->withSubqueue());
 
         self::assertTask($task, 0, States::READY, 'peek_0');
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('take')
+     * @lua tube:put('take', {subqueue = %subqueue%})
      */
     public function testTake() : void
     {
-        $task = $this->queue->take();
+        $task = $this->queue->take(0, $this->withSubqueue());
 
         self::assertTask($task, 0, States::TAKEN, 'take');
     }
@@ -72,7 +72,7 @@ abstract class QueueTest extends TestCase
     public function testTakeNone() : void
     {
         $time = time();
-        $task = $this->queue->take(2);
+        $task = $this->queue->take(2, $this->withSubqueue());
 
         self::assertGreaterThanOrEqual(2, time() - $time);
         self::assertNull($task);
@@ -80,88 +80,88 @@ abstract class QueueTest extends TestCase
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('release_0')
-     * @lua tube:take()
+     * @lua tube:put('release_0', {subqueue = %subqueue%})
+     * @lua tube:take(0, {subqueue = %subqueue%})
      */
     public function testRelease() : void
     {
-        $task = $this->queue->release(0);
+        $task = $this->queue->release(0, $this->withSubqueue());
 
         self::assertTask($task, 0, States::READY, 'release_0');
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('ack_0')
-     * @lua tube:take()
+     * @lua tube:put('ack_0', {subqueue = %subqueue%})
+     * @lua tube:take(0, {subqueue = %subqueue%})
      */
     public function testAck() : void
     {
-        $task = $this->queue->ack(0);
+        $task = $this->queue->ack(0, $this->withSubqueue());
 
         self::assertTask($task, 0, States::DONE, 'ack_0');
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('bury_0')
+     * @lua tube:put('bury_0', {subqueue = %subqueue%})
      */
     public function testBury() : void
     {
-        $task = $this->queue->bury(0);
+        $task = $this->queue->bury(0, $this->withSubqueue());
 
         self::assertTask($task, 0, States::BURIED, 'bury_0');
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('kick_1')
-     * @lua tube:bury(0)
+     * @lua tube:put('kick_1', {subqueue = %subqueue%})
+     * @lua tube:bury(0, {subqueue = %subqueue%})
      */
     public function testKickOne() : void
     {
-        $count = $this->queue->kick(1);
+        $count = $this->queue->kick(1, $this->withSubqueue());
 
         self::assertSame(1, $count);
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('kick_1')
-     * @lua tube:put('kick_2')
-     * @lua tube:put('kick_3')
-     * @lua tube:bury(0)
-     * @lua tube:bury(1)
-     * @lua tube:bury(2)
+     * @lua tube:put('kick_1', {subqueue = %subqueue%})
+     * @lua tube:put('kick_2', {subqueue = %subqueue%})
+     * @lua tube:put('kick_3', {subqueue = %subqueue%})
+     * @lua tube:bury(0, {subqueue = %subqueue%})
+     * @lua tube:bury(1, {subqueue = %subqueue%})
+     * @lua tube:bury(2, {subqueue = %subqueue%})
      */
     public function testKickMany() : void
     {
-        $count = $this->queue->kick(3);
+        $count = $this->queue->kick(3, $this->withSubqueue());
 
         self::assertSame(3, $count);
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('delete_0')
+     * @lua tube:put('delete_0', {subqueue = %subqueue%})
      */
     public function testDelete() : void
     {
-        $task = $this->queue->delete(0);
+        $task = $this->queue->delete(0, $this->withSubqueue());
 
         self::assertTask($task, 0, States::DONE, 'delete_0');
     }
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('truncate_0')
-     * @lua tube:put('truncate_1')
+     * @lua tube:put('truncate_0', {subqueue = %subqueue%})
+     * @lua tube:put('truncate_1', {subqueue = %subqueue%})
      */
     public function testTruncate() : void
     {
         self::assertSame(2, $this->queue->stats('tasks.total'));
 
-        $this->queue->truncate();
+        $this->queue->truncate($this->withSubqueue());
 
         self::assertSame(0, $this->queue->stats('tasks.total'));
     }
@@ -180,20 +180,20 @@ abstract class QueueTest extends TestCase
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('stat_0')
-     * @lua tube:put('stat_1')
-     * @lua tube:put('stat_2')
-     * @lua tube:put('stat_3')
-     * @lua tube:put('stat_4')
-     * @lua tube:delete(4)
-     * @lua tube:take(.001)
-     * @lua tube:release(0)
-     * @lua tube:take(.001)
-     * @lua tube:ack(0)
-     * @lua tube:bury(1)
-     * @lua tube:bury(2)
-     * @lua tube:kick(1)
-     * @lua tube:take(.001)
+     * @lua tube:put('stat_0', {subqueue = %subqueue%})
+     * @lua tube:put('stat_1', {subqueue = %subqueue%})
+     * @lua tube:put('stat_2', {subqueue = %subqueue%})
+     * @lua tube:put('stat_3', {subqueue = %subqueue%})
+     * @lua tube:put('stat_4', {subqueue = %subqueue%})
+     * @lua tube:delete(4, {subqueue = %subqueue%})
+     * @lua tube:take(.001, {subqueue = %subqueue%})
+     * @lua tube:release(0, {subqueue = %subqueue%})
+     * @lua tube:take(.001, {subqueue = %subqueue%})
+     * @lua tube:ack(0, {subqueue = %subqueue%})
+     * @lua tube:bury(1, {subqueue = %subqueue%})
+     * @lua tube:bury(2, {subqueue = %subqueue%})
+     * @lua tube:kick(1, {subqueue = %subqueue%})
+     * @lua tube:take(.001, {subqueue = %subqueue%})
      */
     public function testStats() : void
     {
@@ -262,28 +262,28 @@ abstract class QueueTest extends TestCase
 
     /**
      * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('stat_0')
-     * @lua tube:put('stat_1')
-     * @lua tube:put('stat_2')
-     * @lua tube:put('stat_3')
-     * @lua tube:put('stat_4')
-     * @lua tube:put('stat_5')
-     * @lua tube:put('stat_6')
-     * @lua tube:put('stat_7')
-     * @lua tube:put('stat_8')
-     * @lua tube:put('stat_9')
-     * @lua tube:take(.001)
-     * @lua tube:release(0)
-     * @lua tube:take(.001)
-     * @lua tube:ack(0)
-     * @lua tube:bury(1)
-     * @lua tube:bury(2)
-     * @lua tube:bury(3)
-     * @lua tube:kick(1)
-     * @lua tube:delete(6)
-     * @lua tube:delete(7)
-     * @lua tube:delete(8)
-     * @lua tube:take(.001)
+     * @lua tube:put('stat_0', {subqueue = %subqueue%})
+     * @lua tube:put('stat_1', {subqueue = %subqueue%})
+     * @lua tube:put('stat_2', {subqueue = %subqueue%})
+     * @lua tube:put('stat_3', {subqueue = %subqueue%})
+     * @lua tube:put('stat_4', {subqueue = %subqueue%})
+     * @lua tube:put('stat_5', {subqueue = %subqueue%})
+     * @lua tube:put('stat_6', {subqueue = %subqueue%})
+     * @lua tube:put('stat_7', {subqueue = %subqueue%})
+     * @lua tube:put('stat_8', {subqueue = %subqueue%})
+     * @lua tube:put('stat_9', {subqueue = %subqueue%})
+     * @lua tube:take(.001, {subqueue = %subqueue%})
+     * @lua tube:release(0, {subqueue = %subqueue%})
+     * @lua tube:take(.001, {subqueue = %subqueue%})
+     * @lua tube:ack(0, {subqueue = %subqueue%})
+     * @lua tube:bury(1, {subqueue = %subqueue%})
+     * @lua tube:bury(2, {subqueue = %subqueue%})
+     * @lua tube:bury(3, {subqueue = %subqueue%})
+     * @lua tube:kick(1, {subqueue = %subqueue%})
+     * @lua tube:delete(6, {subqueue = %subqueue%})
+     * @lua tube:delete(7, {subqueue = %subqueue%})
+     * @lua tube:delete(8, {subqueue = %subqueue%})
+     * @lua tube:take(.001, {subqueue = %subqueue%})
      */
     public function testStatsPath() : void
     {
@@ -372,7 +372,7 @@ abstract class QueueTest extends TestCase
     {
         $this->expectException(\Throwable::class);
 
-        $this->queue->$methodName(...$args);
+        $this->queue->$methodName(...array_merge($args, [$this->withSubqueue()]));
     }
 
     public function provideFailureCallbackData() : iterable

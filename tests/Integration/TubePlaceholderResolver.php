@@ -32,9 +32,12 @@ final class TubePlaceholderResolver implements PlaceholderResolver
 
     public function resolve(string $value, Target $target) : string
     {
+       $subqueue = $this->testCase->getSubqueue();
+
         return strtr($value, [
             '%tube_name%' => $this->testCase->getQueueName(),
             '%tube_type%' => $this->testCase->getQueueType(),
+            '%subqueue%'  => $subqueue === null ? 'nil' : "'".$subqueue."'",
         ]);
     }
 }

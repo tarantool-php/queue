@@ -46,24 +46,24 @@ class Queue
         );
     }
 
-    public function take(float $timeout = null) : ?Task
+    public function take(float $timeout = null, array $opts = []) : ?Task
     {
-        $result = $this->client->call("queue.tube.$this->name:take", $timeout);
+        $result = $this->client->call("queue.tube.$this->name:take", $timeout, $opts);
 
         return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
-    public function touch(int $taskId, float $increment) : ?Task
+    public function touch(int $taskId, float $increment, array $opts = []) : ?Task
     {
-        $result = $this->client->call("queue.tube.$this->name:touch", $taskId, $increment);
+        $result = $this->client->call("queue.tube.$this->name:touch", $taskId, $increment, $opts);
 
         return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
-    public function ack(int $taskId) : Task
+    public function ack(int $taskId, array $opts = []) : Task
     {
         return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:ack", $taskId)[0]
+            $this->client->call("queue.tube.$this->name:ack", $taskId, $opts)[0]
         );
     }
 
@@ -74,35 +74,35 @@ class Queue
         );
     }
 
-    public function peek(int $taskId) : Task
+    public function peek(int $taskId, array $opts = []) : Task
     {
         return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:peek", $taskId)[0]
+            $this->client->call("queue.tube.$this->name:peek", $taskId, $opts)[0]
         );
     }
 
-    public function bury(int $taskId) : Task
+    public function bury(int $taskId, array $opts = []) : Task
     {
         return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:bury", $taskId)[0]
+            $this->client->call("queue.tube.$this->name:bury", $taskId, $opts)[0]
         );
     }
 
-    public function kick(int $count) : int
+    public function kick(int $count, array $opts = []) : int
     {
-        return $this->client->call("queue.tube.$this->name:kick", $count)[0];
+        return $this->client->call("queue.tube.$this->name:kick", $count, $opts)[0];
     }
 
-    public function delete(int $taskId) : Task
+    public function delete(int $taskId, array $opts = []) : Task
     {
         return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:delete", $taskId)[0]
+            $this->client->call("queue.tube.$this->name:delete", $taskId, $opts)[0]
         );
     }
 
-    public function truncate() : void
+    public function truncate(array $opts = []) : void
     {
-        $this->client->call("queue.tube.$this->name:truncate");
+        $this->client->call("queue.tube.$this->name:truncate", $opts);
     }
 
     /**
