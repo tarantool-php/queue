@@ -220,6 +220,8 @@ abstract class QueueTest extends TestCase
                 'ttr' => 0,
                 'delay' => 0,
                 'ttl' => 0,
+	        ],
+            'extra' => [
             ],
         ], $stats);
     }
@@ -252,6 +254,8 @@ abstract class QueueTest extends TestCase
                 'ttr' => 0,
                 'delay' => 0,
                 'ttl' => 0,
+	        ],
+            'extra' => [
             ],
         ], $stats);
     }
