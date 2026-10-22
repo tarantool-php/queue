@@ -14,87 +14,74 @@ jobs:
       actions: read
       contents: read
     env:
-      TNT_IMAGE: tarantool/tarantool:2.11
-      PHP_IMAGE: php:8.2-cli
+      TNT_LISTEN_URI: localhost:3301
     strategy:
       fail-fast: false
       max-parallel: 10
       matrix:
         operating-system: [ubuntu-24.04]
-        env:
-          - TNT_IMAGE: tarantool/tarantool:3.7
-          - TNT_IMAGE: tarantool/tarantool:3.6
-          - TNT_IMAGE: tarantool/tarantool:3.5
-          - TNT_IMAGE: tarantool/tarantool:3.4
-          - TNT_IMAGE: tarantool/tarantool:3.3
-          - TNT_IMAGE: tarantool/tarantool:3.2
-          - TNT_IMAGE: tarantool/tarantool:3.1
-          - TNT_IMAGE: tarantool/tarantool:3.0
-          - TNT_IMAGE: tarantool/tarantool:2.11
-          - TNT_IMAGE: tarantool/tarantool:2.10
-          - TNT_IMAGE: tarantool/tarantool:2.8
-          - TNT_IMAGE: tarantool/tarantool:2.7
-          - TNT_IMAGE: tarantool/tarantool:2.6
-          - TNT_IMAGE: tarantool/tarantool:2.5
-          - TNT_IMAGE: tarantool/tarantool:2.4
-          - TNT_IMAGE: tarantool/tarantool:2.3
-          - TNT_IMAGE: tarantool/tarantool:2.2
-          - TNT_IMAGE: tarantool/tarantool:2.1
-          - TNT_IMAGE: tarantool/tarantool:1
-          - TNT_IMAGE: tarantool/tarantool:1.9
-          - TNT_IMAGE: tarantool/tarantool:1.7
+        tarantool-release: ['2', '3']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
+        include:
+          - php-version: '8.2'
+            QA: true
+          - php-version: '8.3'
+            tarantool-release: '3'
+            COVERAGE: true
 
-          - PHP_IMAGE: php:8.5-cli
-          - PHP_IMAGE: php:8.4-cli
-
-          - PHP_IMAGE: php:8.2-cli
-            QA: 1
-
-          - COVERAGE_FILE: coverage.xml
-            PHP_IMAGE: php:8.3-cli
-
-    name: ${{ matrix.env.PHP_IMAGE || 'php:8.2-cli' }}, ${{ matrix.env.TNT_IMAGE || 'tarantool/tarantool:2.11' }}${{ matrix.env.QA && ', qa' || '' }}${{ matrix.env.COVERAGE_FILE && ', coverage' || '' }}
+    name: PHP ${{ matrix.php-version }}, Tarantool ${{ matrix.tarantool-release }}${{ matrix.QA && ', qa' || '' }}${{ matrix.COVERAGE && ', coverage' || '' }}
     runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Build docker image
-        env: ${{ matrix.env }}
+      - name: Install Tarantool and tt
+        env:
+          TNT_RELEASE: ${{ matrix.tarantool-release }}
         run: |
-          ./dockerfile.sh | tee /dev/tty | docker build -t queue -
-          docker build \
-            --build-arg TNT_IMAGE="$TNT_IMAGE" \
-            -f tests/Integration/Dockerfile \
-            -t queue-tarantool .
+          curl -L "https://tarantool.io/release/$TNT_RELEASE/installer.sh" | sudo bash
+          sudo apt-get install -y tarantool tt
+          tarantool --version
+          tt version
+
+      - name: Install the tarantool/queue module
+        run: tt rocks install queue
+
+      - name: Build PHP image
+        env:
+          PHP_IMAGE: php:${{ matrix.php-version }}-cli
+          TNT_LISTEN_URI: localhost:3301
+          COVERAGE_FILE: ${{ matrix.COVERAGE && 'coverage.xml' || '' }}
+        run: ./dockerfile.sh | tee /dev/tty | docker build -t queue -
 
       - name: Test
-        env: ${{ matrix.env }}
         run: |
-          docker network create tarantool-php
-          docker run --net=tarantool-php --rm queue-tarantool tarantool --version
-          docker run -d \
-            --net=tarantool-php \
-            --name=tarantool \
-            -v "$PWD:/queue" \
-            -e TNT_LISTEN_URI="$TNT_LISTEN_URI" \
-            queue-tarantool tarantool /queue/tests/Integration/queues.lua
-          docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue queue
+          tarantool ./tests/Integration/queues.lua > tarantool.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if bash -c 'echo > /dev/tcp/127.0.0.1/3301' 2>/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "${ready:-}" != 1 ]; then
+            cat tarantool.log
+            exit 1
+          fi
+          docker run --rm --network=host -v "$PWD:/queue" -w /queue queue
 
       - name: Check code quality
-        env: ${{ matrix.env }}
-        if: ${{ env.QA }}
+        if: ${{ matrix.QA }}
         run: |
-          docker run --net=tarantool-php --rm -v $PWD:/queue -w /queue queue php vendor/bin/php-cs-fixer fix --dry-run --diff --verbose .
-          docker run --net=tarantool-php --rm -v $PWD:/queue -w /queue queue php vendor/bin/psalm
+          docker run --rm --network=host -v "$PWD:/queue" -w /queue queue php vendor/bin/php-cs-fixer fix --dry-run --diff --verbose .
+          docker run --rm --network=host -v "$PWD:/queue" -w /queue queue php vendor/bin/psalm
 
       - name: Upload code coverage report
-        env: ${{ matrix.env }}
-        if: ${{ env.COVERAGE_FILE }}
+        if: ${{ matrix.COVERAGE }}
         uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ strategy.job-index }}
-          path: ${{ env.COVERAGE_FILE }}
+          path: coverage.xml
 
   coverage:
     needs: tests
