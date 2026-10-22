@@ -19,7 +19,7 @@ class Queue
 {
     public function __construct(
         private readonly Client $client,
-        private readonly string $name
+        private readonly string $name,
     ) {
     }
 

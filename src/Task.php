@@ -18,7 +18,7 @@ final class Task
     private function __construct(
         private readonly int $id,
         private readonly string $state,
-        private readonly mixed $data
+        private readonly mixed $data,
     ) {
     }
 
