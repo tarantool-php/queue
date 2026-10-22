@@ -40,7 +40,7 @@ jobs:
           TNT_RELEASE: ${{ matrix.tarantool-release }}
         run: |
           curl -L "https://tarantool.io/release/$TNT_RELEASE/installer.sh" | sudo bash
-          sudo apt-get install -y tarantool tt
+          sudo apt-get install -y tarantool tarantool-dev tt
           tarantool --version
           tt version
 
