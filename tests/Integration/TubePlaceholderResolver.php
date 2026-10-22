@@ -25,6 +25,11 @@ final class TubePlaceholderResolver implements PlaceholderResolver
         $this->testCase = $testCase;
     }
 
+    public function getName() : string
+    {
+        return 'tube';
+    }
+
     public function resolve(string $value, Target $target) : string
     {
         return strtr($value, [
