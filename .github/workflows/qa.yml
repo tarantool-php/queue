@@ -24,6 +24,7 @@ jobs:
         php-version: ['8.2', '8.3', '8.4', '8.5']
         include:
           - php-version: '8.2'
+            tarantool-release: '3'
             QA: true
           - php-version: '8.3'
             tarantool-release: '3'
