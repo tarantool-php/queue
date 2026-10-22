@@ -17,13 +17,10 @@ use Tarantool\Client\Client;
 
 class Queue
 {
-    private $client;
-    private $name;
-
-    public function __construct(Client $client, string $name)
-    {
-        $this->client = $client;
-        $this->name = $name;
+    public function __construct(
+        private readonly Client $client,
+        private readonly string $name
+    ) {
     }
 
     public function getClient() : Client
@@ -36,7 +33,7 @@ class Queue
         return $this->name;
     }
 
-    public function put($data, array $options = []) : Task
+    public function put(mixed $data, array $options = []) : Task
     {
         return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:put", $data, $options)[0]
