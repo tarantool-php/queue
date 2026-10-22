@@ -16,4 +16,9 @@
       <exclude>tests/Integration/QueueTest.php</exclude>
     </testsuite>
   </testsuites>
+  <source>
+    <include>
+      <directory>src</directory>
+    </include>
+  </source>
 </phpunit>
