@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
 
     public function getQueueName() : string
     {
-        $methodName = $this->getName(false);
+        $methodName = $this->name();
         if (0 === strpos($methodName, 'test')) {
             $methodName = substr($methodName, 4);
         }
