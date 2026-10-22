@@ -1,5 +1,6 @@
 <?php
-    /**
+
+/**
  * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>

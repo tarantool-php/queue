@@ -1,5 +1,6 @@
 <?php
-    /**
+
+/**
  * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
@@ -32,7 +33,7 @@ final class TaskTest extends TestCase
         }
     }
 
-    public function provideTuples() : iterable
+    public static function provideTuples() : iterable
     {
         return [
             [[0, States::READY, [42]]],
@@ -64,7 +65,7 @@ final class TaskTest extends TestCase
         }
     }
 
-    public function provideStates() : iterable
+    public static function provideStates() : iterable
     {
         return [
             [States::READY],

@@ -18,12 +18,8 @@ final class Task
     private $id;
     private $state;
 
-    /** @var mixed */
     private $data;
 
-    /**
-     * @param mixed $data
-     */
     private function __construct(int $id, string $state, $data)
     {
         $this->id = $id;
@@ -48,9 +44,6 @@ final class Task
         return $this->state;
     }
 
-    /**
-     * @return mixed
-     */
     public function getData()
     {
         return $this->data;

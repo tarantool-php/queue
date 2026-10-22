@@ -1,5 +1,6 @@
 <?php
-    /**
+
+/**
  * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
@@ -18,9 +19,6 @@ use Tarantool\Queue\States;
 
 abstract class QueueTest extends TestCase
 {
-    /**
-     * @param mixed $data
-     */
     #[DataProvider('provideTaskData')]
     #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testPut($data) : void
@@ -30,7 +28,7 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::READY, $data);
     }
 
-    public function provideTaskData() : iterable
+    public static function provideTaskData() : iterable
     {
         return [
             [null],
@@ -200,7 +198,7 @@ abstract class QueueTest extends TestCase
                 'ttr' => 0,
                 'delay' => 0,
                 'ttl' => 0,
-	        ],
+            ],
         ], $stats);
     }
 
@@ -234,7 +232,7 @@ abstract class QueueTest extends TestCase
                 'ttr' => 0,
                 'delay' => 0,
                 'ttl' => 0,
-	        ],
+            ],
         ], $stats);
     }
 
@@ -313,7 +311,7 @@ abstract class QueueTest extends TestCase
         $this->queue->stats($path);
     }
 
-    public function provideStatsInvalidPathData() : iterable
+    public static function provideStatsInvalidPathData() : iterable
     {
         return [
             [''],
@@ -345,7 +343,7 @@ abstract class QueueTest extends TestCase
         $this->queue->$methodName(...$args);
     }
 
-    public function provideFailureCallbackData() : array
+    public static function provideFailureCallbackData() : array
     {
         return [
             ['ack', [42]],

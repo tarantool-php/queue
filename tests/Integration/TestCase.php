@@ -31,7 +31,7 @@ abstract class TestCase extends BaseTestCase
     public function getQueueName() : string
     {
         $methodName = $this->name();
-        if (0 === strpos($methodName, 'test')) {
+        if (str_starts_with($methodName, 'test')) {
             $methodName = substr($methodName, 4);
         }
 
@@ -56,9 +56,9 @@ abstract class TestCase extends BaseTestCase
             return $this->client = Client::fromDefaults();
         }
 
-        if (0 === strpos($uri, '/')) {
+        if (str_starts_with($uri, '/')) {
             $dsn = 'unix://'.$uri;
-        } elseif (0 === strpos($uri, 'unix/:')) {
+        } elseif (str_starts_with($uri, 'unix/:')) {
             $dsn = 'unix://'.substr($uri, 6);
         } elseif (ctype_digit($uri)) {
             $dsn = 'tcp://127.0.0.1:'.$uri;

@@ -36,9 +36,6 @@ class Queue
         return $this->name;
     }
 
-    /**
-     * @param mixed $data
-     */
     public function put($data, array $options = []) : Task
     {
         return Task::fromTuple(
@@ -46,7 +43,7 @@ class Queue
         );
     }
 
-    public function take(float $timeout = null) : ?Task
+    public function take(?float $timeout = null) : ?Task
     {
         $result = $this->client->call("queue.tube.$this->name:take", $timeout);
 
@@ -118,7 +115,7 @@ class Queue
             return $stats;
         }
 
-        foreach (\explode('.', $path) as $key) {
+        foreach (explode('.', $path) as $key) {
             if (!isset($stats[$key])) {
                 throw new \InvalidArgumentException(\sprintf('Invalid path "%s"', $path));
             }
@@ -128,9 +125,6 @@ class Queue
         return $stats;
     }
 
-    /**
-     * @param mixed ...$args
-     */
     public function call(string $methodName, ...$args) : array
     {
         return $this->client->call("queue.tube.$this->name:$methodName", ...$args);
