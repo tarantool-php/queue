@@ -17,13 +17,10 @@ use Tarantool\Client\Client;
 
 class Queue
 {
-    private $client;
-    private $name;
-
-    public function __construct(Client $client, string $name)
-    {
-        $this->client = $client;
-        $this->name = $name;
+    public function __construct(
+        private readonly Client $client,
+        private readonly string $name,
+    ) {
     }
 
     public function getClient() : Client
@@ -36,17 +33,14 @@ class Queue
         return $this->name;
     }
 
-    /**
-     * @param mixed $data
-     */
-    public function put($data, array $options = []) : Task
+    public function put(mixed $data, array $options = []) : Task
     {
         return Task::fromTuple(
             $this->client->call("queue.tube.$this->name:put", $data, $options)[0]
         );
     }
 
-    public function take(float $timeout = null) : ?Task
+    public function take(?float $timeout = null) : ?Task
     {
         $result = $this->client->call("queue.tube.$this->name:take", $timeout);
 
@@ -118,7 +112,7 @@ class Queue
             return $stats;
         }
 
-        foreach (\explode('.', $path) as $key) {
+        foreach (explode('.', $path) as $key) {
             if (!isset($stats[$key])) {
                 throw new \InvalidArgumentException(\sprintf('Invalid path "%s"', $path));
             }
@@ -128,9 +122,6 @@ class Queue
         return $stats;
     }
 
-    /**
-     * @param mixed ...$args
-     */
     public function call(string $methodName, ...$args) : array
     {
         return $this->client->call("queue.tube.$this->name:$methodName", ...$args);

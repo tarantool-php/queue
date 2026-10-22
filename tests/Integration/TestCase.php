@@ -13,17 +13,15 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
-use PHPUnitExtras\Annotation\AnnotationProcessorBuilder;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnitExtras\Attribute\AttributeProcessorBuilder;
 use Tarantool\Client\Client;
 use Tarantool\PhpUnit\TestCase as BaseTestCase;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\Task;
-use Tarantool\Queue\Tests\PhpUnitCompat;
 
 abstract class TestCase extends BaseTestCase
 {
-    use PhpUnitCompat;
-
     /** @var Client|null */
     private $client;
 
@@ -32,8 +30,8 @@ abstract class TestCase extends BaseTestCase
 
     public function getQueueName() : string
     {
-        $methodName = $this->getName(false);
-        if (0 === strpos($methodName, 'test')) {
+        $methodName = $this->name();
+        if (str_starts_with($methodName, 'test')) {
             $methodName = substr($methodName, 4);
         }
 
@@ -58,9 +56,9 @@ abstract class TestCase extends BaseTestCase
             return $this->client = Client::fromDefaults();
         }
 
-        if (0 === strpos($uri, '/')) {
+        if (str_starts_with($uri, '/')) {
             $dsn = 'unix://'.$uri;
-        } elseif (0 === strpos($uri, 'unix/:')) {
+        } elseif (str_starts_with($uri, 'unix/:')) {
             $dsn = 'unix://'.substr($uri, 6);
         } elseif (ctype_digit($uri)) {
             $dsn = 'tcp://127.0.0.1:'.$uri;
@@ -71,15 +69,13 @@ abstract class TestCase extends BaseTestCase
         return $this->client = Client::fromDsn($dsn);
     }
 
-    final protected function createAnnotationProcessorBuilder() : AnnotationProcessorBuilder
+    final protected function createAttributeProcessorBuilder() : AttributeProcessorBuilder
     {
-        return parent::createAnnotationProcessorBuilder()
+        return parent::createAttributeProcessorBuilder()
             ->addPlaceholderResolver(new TubePlaceholderResolver($this));
     }
 
-    /**
-     * @before
-     */
+    #[Before]
     final protected function initQueue() : void
     {
         $this->queue = new Queue($this->getClient(), $this->getQueueName());

@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tarantool\Queue\States;
 use Tarantool\Queue\Task;
 
 final class TaskTest extends TestCase
 {
-    /**
-     * @dataProvider provideTuples
-     */
+    #[DataProvider('provideTuples')]
     public function testCreateFromTuple(array $tuple) : void
     {
         $task = Task::fromTuple($tuple);
@@ -34,7 +33,7 @@ final class TaskTest extends TestCase
         }
     }
 
-    public function provideTuples() : iterable
+    public static function provideTuples() : array
     {
         return [
             [[0, States::READY, [42]]],
@@ -43,9 +42,7 @@ final class TaskTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideStates
-     */
+    #[DataProvider('provideStates')]
     public function testIsser(string $state) : void
     {
         static $map = [
@@ -68,7 +65,7 @@ final class TaskTest extends TestCase
         }
     }
 
-    public function provideStates() : iterable
+    public static function provideStates() : array
     {
         return [
             [States::READY],

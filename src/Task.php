@@ -15,20 +15,11 @@ namespace Tarantool\Queue;
 
 final class Task
 {
-    private $id;
-    private $state;
-
-    /** @var mixed */
-    private $data;
-
-    /**
-     * @param mixed $data
-     */
-    private function __construct(int $id, string $state, $data)
-    {
-        $this->id = $id;
-        $this->state = $state;
-        $this->data = $data;
+    private function __construct(
+        private readonly int $id,
+        private readonly string $state,
+        private readonly mixed $data,
+    ) {
     }
 
     public static function fromTuple(array $tuple) : self
@@ -48,10 +39,7 @@ final class Task
         return $this->state;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getData()
+    public function getData() : mixed
     {
         return $this->data;
     }

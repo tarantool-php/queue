@@ -6,6 +6,12 @@
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
+    <issueHandlers>
+        <PossiblyUnusedMethod errorLevel="info" />
+        <UnusedClass errorLevel="info" />
+        <UnusedConstructor errorLevel="info" />
+    </issueHandlers>
+
     <projectFiles>
         <directory name="src" />
         <ignoreFiles>

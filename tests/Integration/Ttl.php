@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use Tarantool\PhpUnit\Attribute\Lua;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
 trait Ttl
 {
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('ttr_1', {ttr = 1})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('ttr_1', {ttr = 1})")]
     public function testTimeToRun() : void
     {
         $queue = $this->getQueue();
@@ -35,10 +34,8 @@ trait Ttl
         self::assertEquals($task1, $task2);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('ttl_1', {ttl = 1})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('ttl_1', {ttl = 1})")]
     public function testTimeToLive() : void
     {
         sleep(1);
@@ -47,10 +44,8 @@ trait Ttl
         self::assertNull($task);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('touch_ttr_1', {ttr = 1})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('touch_ttr_1', {ttr = 1})")]
     public function testTouchTimeToRun() : void
     {
         $queue = $this->getQueue();
@@ -66,10 +61,8 @@ trait Ttl
         self::assertNull($task3);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('touch_ttl_1', {ttl = 1})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('touch_ttl_1', {ttl = 1})")]
     public function testTouchTimeToLive() : void
     {
         $queue = $this->getQueue();
@@ -86,10 +79,8 @@ trait Ttl
         self::assertEquals($task2, $task3);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('touch_invalid_interval')
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('touch_invalid_interval')")]
     public function testTouchInvalidInterval() : void
     {
         $queue = $this->getQueue();
@@ -100,11 +91,9 @@ trait Ttl
         }
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('pri_low', {pri = 2})
-     * @lua tube:put('pri_high', {pri = 1})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('pri_low', {pri = 2})")]
+    #[Lua("tube:put('pri_high', {pri = 1})")]
     public function testPriority() : void
     {
         $queue = $this->getQueue();
@@ -119,10 +108,8 @@ trait Ttl
         self::assertSame('pri_low', $task2->getData());
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('delay_1', {delay = 1})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('delay_1', {delay = 1})")]
     public function testDelay() : void
     {
         $queue = $this->getQueue();
@@ -136,11 +123,9 @@ trait Ttl
         self::assertTask($task, 0, States::TAKEN, 'delay_1');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('release_0')
-     * @lua tube:take()
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('release_0')")]
+    #[Lua('tube:take()')]
     public function testDelayedRelease() : void
     {
         $queue = $this->getQueue();
@@ -156,11 +141,9 @@ trait Ttl
         self::assertTask($task, 0, States::TAKEN, 'release_0');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('stat_delayed_0', {delay = 9999})
-     * @lua tube:put('stat_delayed_1', {delay = 9999})
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('stat_delayed_0', {delay = 9999})")]
+    #[Lua("tube:put('stat_delayed_1', {delay = 9999})")]
     public function testStatsDelayed() : void
     {
         $count = $this->getQueue()->stats('tasks.delayed');

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
-use PHPUnitExtras\Annotation\PlaceholderResolver\PlaceholderResolver;
-use PHPUnitExtras\Annotation\Target;
+use PHPUnitExtras\Attribute\PlaceholderResolver\PlaceholderResolver;
+use PHPUnitExtras\Attribute\Target;
 
 final class TubePlaceholderResolver implements PlaceholderResolver
 {
