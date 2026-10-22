@@ -11,13 +11,14 @@
         }
     ],
     "require": {
-        "php": "^7.2.5|^8",
-        "tarantool/client": "^0.10"
+        "php": "^8.2",
+        "tarantool/client": "^0.11"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.19",
-        "tarantool/phpunit-extras": "^0.2",
-        "vimeo/psalm": "^3.9|^4"
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpunit/phpunit": "^10.5",
+        "tarantool/phpunit-extras": "^0.3.2",
+        "vimeo/psalm": "^5.23|^6"
     },
     "autoload": {
         "psr-4": {

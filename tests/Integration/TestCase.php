@@ -13,17 +13,15 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
-use PHPUnitExtras\Annotation\AnnotationProcessorBuilder;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnitExtras\Attribute\AttributeProcessorBuilder;
 use Tarantool\Client\Client;
 use Tarantool\PhpUnit\TestCase as BaseTestCase;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\Task;
-use Tarantool\Queue\Tests\PhpUnitCompat;
 
 abstract class TestCase extends BaseTestCase
 {
-    use PhpUnitCompat;
-
     /** @var Client|null */
     private $client;
 
@@ -71,15 +69,13 @@ abstract class TestCase extends BaseTestCase
         return $this->client = Client::fromDsn($dsn);
     }
 
-    final protected function createAnnotationProcessorBuilder() : AnnotationProcessorBuilder
+    final protected function createAttributeProcessorBuilder() : AttributeProcessorBuilder
     {
-        return parent::createAnnotationProcessorBuilder()
+        return parent::createAttributeProcessorBuilder()
             ->addPlaceholderResolver(new TubePlaceholderResolver($this));
     }
 
-    /**
-     * @before
-     */
+    #[Before]
     final protected function initQueue() : void
     {
         $this->queue = new Queue($this->getClient(), $this->getQueueName());

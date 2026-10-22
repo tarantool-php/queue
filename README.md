@@ -1,8 +1,6 @@
 # Tarantool Queue
 
 [![Quality Assurance](https://github.com/tarantool-php/queue/workflows/QA/badge.svg)](https://github.com/tarantool-php/queue/actions?query=workflow%3AQA)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tarantool-php/queue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tarantool-php/queue/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/tarantool-php/queue/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/tarantool-php/queue/?branch=master)
 [![Mentioned in Awesome PHP](https://awesome.re/mentioned-badge.svg)](https://github.com/ziadoz/awesome-php)
 [![Telegram](https://img.shields.io/badge/Telegram-join%20chat-blue.svg)](https://t.me/tarantool_php)
 
@@ -27,6 +25,8 @@ Lua modules, called [LuaRocks](https://luarocks.org/). This package provides PHP
 
 
 ## Installation
+
+This library requires PHP 8.2 or newer.
 
 The recommended way to install the library is through [Composer](http://getcomposer.org):
 

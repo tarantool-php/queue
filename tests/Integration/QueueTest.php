@@ -1,6 +1,5 @@
 <?php
-
-/**
+    /**
  * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
@@ -13,16 +12,17 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tarantool\PhpUnit\Attribute\Lua;
 use Tarantool\Queue\States;
 
 abstract class QueueTest extends TestCase
 {
     /**
-     * @dataProvider provideTaskData
-     * @lua create_tube('%tube_name%', '%tube_type%')
-     *
      * @param mixed $data
      */
+    #[DataProvider('provideTaskData')]
+    #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testPut($data) : void
     {
         $task = $this->queue->put($data);
@@ -44,10 +44,8 @@ abstract class QueueTest extends TestCase
         ];
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('peek_0')
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('peek_0')")]
     public function testPeek() : void
     {
         $task = $this->queue->peek(0);
@@ -55,10 +53,8 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::READY, 'peek_0');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('take')
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('take')")]
     public function testTake() : void
     {
         $task = $this->queue->take();
@@ -66,9 +62,7 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::TAKEN, 'take');
     }
 
-    /**
-     * @lua create_tube('%tube_name%', '%tube_type%')
-     */
+    #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testTakeNone() : void
     {
         $time = time();
@@ -78,11 +72,9 @@ abstract class QueueTest extends TestCase
         self::assertNull($task);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('release_0')
-     * @lua tube:take()
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('release_0')")]
+    #[Lua('tube:take()')]
     public function testRelease() : void
     {
         $task = $this->queue->release(0);
@@ -90,11 +82,9 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::READY, 'release_0');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('ack_0')
-     * @lua tube:take()
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('ack_0')")]
+    #[Lua('tube:take()')]
     public function testAck() : void
     {
         $task = $this->queue->ack(0);
@@ -102,10 +92,8 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::DONE, 'ack_0');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('bury_0')
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('bury_0')")]
     public function testBury() : void
     {
         $task = $this->queue->bury(0);
@@ -113,11 +101,9 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::BURIED, 'bury_0');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('kick_1')
-     * @lua tube:bury(0)
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('kick_1')")]
+    #[Lua('tube:bury(0)')]
     public function testKickOne() : void
     {
         $count = $this->queue->kick(1);
@@ -125,15 +111,13 @@ abstract class QueueTest extends TestCase
         self::assertSame(1, $count);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('kick_1')
-     * @lua tube:put('kick_2')
-     * @lua tube:put('kick_3')
-     * @lua tube:bury(0)
-     * @lua tube:bury(1)
-     * @lua tube:bury(2)
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('kick_1')")]
+    #[Lua("tube:put('kick_2')")]
+    #[Lua("tube:put('kick_3')")]
+    #[Lua('tube:bury(0)')]
+    #[Lua('tube:bury(1)')]
+    #[Lua('tube:bury(2)')]
     public function testKickMany() : void
     {
         $count = $this->queue->kick(3);
@@ -141,10 +125,8 @@ abstract class QueueTest extends TestCase
         self::assertSame(3, $count);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('delete_0')
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('delete_0')")]
     public function testDelete() : void
     {
         $task = $this->queue->delete(0);
@@ -152,11 +134,9 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::DONE, 'delete_0');
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('truncate_0')
-     * @lua tube:put('truncate_1')
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('truncate_0')")]
+    #[Lua("tube:put('truncate_1')")]
     public function testTruncate() : void
     {
         self::assertSame(2, $this->queue->stats('tasks.total'));
@@ -166,9 +146,7 @@ abstract class QueueTest extends TestCase
         self::assertSame(0, $this->queue->stats('tasks.total'));
     }
 
-    /**
-     * @lua create_tube('%tube_name%', '%tube_type%')
-     */
+    #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testTruncateEmpty() : void
     {
         self::assertSame(0, $this->queue->stats('tasks.total'));
@@ -178,23 +156,21 @@ abstract class QueueTest extends TestCase
         self::assertSame(0, $this->queue->stats('tasks.total'));
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('stat_0')
-     * @lua tube:put('stat_1')
-     * @lua tube:put('stat_2')
-     * @lua tube:put('stat_3')
-     * @lua tube:put('stat_4')
-     * @lua tube:delete(4)
-     * @lua tube:take(.001)
-     * @lua tube:release(0)
-     * @lua tube:take(.001)
-     * @lua tube:ack(0)
-     * @lua tube:bury(1)
-     * @lua tube:bury(2)
-     * @lua tube:kick(1)
-     * @lua tube:take(.001)
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('stat_0')")]
+    #[Lua("tube:put('stat_1')")]
+    #[Lua("tube:put('stat_2')")]
+    #[Lua("tube:put('stat_3')")]
+    #[Lua("tube:put('stat_4')")]
+    #[Lua('tube:delete(4)')]
+    #[Lua('tube:take(.001)')]
+    #[Lua('tube:release(0)')]
+    #[Lua('tube:take(.001)')]
+    #[Lua('tube:ack(0)')]
+    #[Lua('tube:bury(1)')]
+    #[Lua('tube:bury(2)')]
+    #[Lua('tube:kick(1)')]
+    #[Lua('tube:take(.001)')]
     public function testStats() : void
     {
         $stats = $this->queue->stats();
@@ -226,9 +202,7 @@ abstract class QueueTest extends TestCase
         ], $stats);
     }
 
-    /**
-     * @lua create_tube('%tube_name%', '%tube_type%')
-     */
+    #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testEmptyStats() : void
     {
         $stats = $this->queue->stats();
@@ -260,31 +234,29 @@ abstract class QueueTest extends TestCase
         ], $stats);
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube:put('stat_0')
-     * @lua tube:put('stat_1')
-     * @lua tube:put('stat_2')
-     * @lua tube:put('stat_3')
-     * @lua tube:put('stat_4')
-     * @lua tube:put('stat_5')
-     * @lua tube:put('stat_6')
-     * @lua tube:put('stat_7')
-     * @lua tube:put('stat_8')
-     * @lua tube:put('stat_9')
-     * @lua tube:take(.001)
-     * @lua tube:release(0)
-     * @lua tube:take(.001)
-     * @lua tube:ack(0)
-     * @lua tube:bury(1)
-     * @lua tube:bury(2)
-     * @lua tube:bury(3)
-     * @lua tube:kick(1)
-     * @lua tube:delete(6)
-     * @lua tube:delete(7)
-     * @lua tube:delete(8)
-     * @lua tube:take(.001)
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua("tube:put('stat_0')")]
+    #[Lua("tube:put('stat_1')")]
+    #[Lua("tube:put('stat_2')")]
+    #[Lua("tube:put('stat_3')")]
+    #[Lua("tube:put('stat_4')")]
+    #[Lua("tube:put('stat_5')")]
+    #[Lua("tube:put('stat_6')")]
+    #[Lua("tube:put('stat_7')")]
+    #[Lua("tube:put('stat_8')")]
+    #[Lua("tube:put('stat_9')")]
+    #[Lua('tube:take(.001)')]
+    #[Lua('tube:release(0)')]
+    #[Lua('tube:take(.001)')]
+    #[Lua('tube:ack(0)')]
+    #[Lua('tube:bury(1)')]
+    #[Lua('tube:bury(2)')]
+    #[Lua('tube:bury(3)')]
+    #[Lua('tube:kick(1)')]
+    #[Lua('tube:delete(6)')]
+    #[Lua('tube:delete(7)')]
+    #[Lua('tube:delete(8)')]
+    #[Lua('tube:take(.001)')]
     public function testStatsPath() : void
     {
         self::assertEquals([
@@ -327,10 +299,8 @@ abstract class QueueTest extends TestCase
         self::assertSame(3, $this->queue->stats('calls.bury'));
     }
 
-    /**
-     * @dataProvider provideStatsInvalidPathData
-     * @lua create_tube('%tube_name%', '%tube_type%')
-     */
+    #[DataProvider('provideStatsInvalidPathData')]
+    #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testStatsInvalidPath(?string $path) : void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -354,10 +324,8 @@ abstract class QueueTest extends TestCase
         ];
     }
 
-    /**
-     * @lua tube = create_tube('%tube_name%', '%tube_type%')
-     * @lua tube.pow = function(self, base, exp) return math.pow(base, exp) end
-     */
+    #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
+    #[Lua('tube.pow = function(self, base, exp) return math.pow(base, exp) end')]
     public function testCall() : void
     {
         $result = $this->queue->call('pow', 2, 8);
@@ -365,9 +333,7 @@ abstract class QueueTest extends TestCase
         self::assertSame(256, $result[0]);
     }
 
-    /**
-     * @dataProvider provideFailureCallbackData
-     */
+    #[DataProvider('provideFailureCallbackData')]
     public function testThrowException(string $methodName, array $args) : void
     {
         $this->expectException(\Throwable::class);

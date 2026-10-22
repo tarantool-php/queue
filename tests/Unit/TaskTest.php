@@ -1,6 +1,5 @@
 <?php
-
-/**
+    /**
  * This file is part of the tarantool/queue package.
  *
  * (c) Eugene Leonovich <gen.work@gmail.com>
@@ -13,15 +12,14 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tarantool\Queue\States;
 use Tarantool\Queue\Task;
 
 final class TaskTest extends TestCase
 {
-    /**
-     * @dataProvider provideTuples
-     */
+    #[DataProvider('provideTuples')]
     public function testCreateFromTuple(array $tuple) : void
     {
         $task = Task::fromTuple($tuple);
@@ -43,9 +41,7 @@ final class TaskTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideStates
-     */
+    #[DataProvider('provideStates')]
     public function testIsser(string $state) : void
     {
         static $map = [
