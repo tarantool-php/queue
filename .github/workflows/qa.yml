@@ -67,7 +67,7 @@ jobs:
         env: ${{ matrix.env }}
         run: |
           docker network create tarantool-php
-          docker run --net=tarantool-php --rm $TNT_IMAGE /usr/local/bin/tarantool --version
+          docker run --net=tarantool-php --rm $TNT_IMAGE sh -c "tarantool --version"
           docker run -d --net=tarantool-php --name=tarantool -v `pwd`:/queue -e TNT_LISTEN_URI=$TNT_LISTEN_URI ${TNT_IMAGE} tarantool /queue/tests/Integration/queues.lua
           docker run --rm --net=tarantool-php -v `pwd`:/queue -w /queue queue
 
