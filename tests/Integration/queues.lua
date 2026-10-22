@@ -5,8 +5,8 @@ local listen = os.getenv('TNT_LISTEN_URI')
 box.cfg {
     listen = (listen == '' or listen == nil) and 3301 or listen,
     log_level = 6,
-    memtx_dir = '/tmp',
-    wal_dir = '/tmp'
+    wal_mode = 'none',
+    memtx_dir = '/tmp'
 }
 
 box.schema.user.grant('guest', 'read,write,execute,create,drop,alter', 'universe', nil, {if_not_exists = true})
