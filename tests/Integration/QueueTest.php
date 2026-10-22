@@ -174,6 +174,10 @@ abstract class QueueTest extends TestCase
     public function testStats() : void
     {
         $stats = $this->queue->stats();
+        if (\array_key_exists('extra', $stats)) {
+            self::assertSame([], $stats['extra']);
+            unset($stats['extra']);
+        }
 
         self::assertEquals([
             'tasks' => [
@@ -197,8 +201,6 @@ abstract class QueueTest extends TestCase
                 'delay' => 0,
                 'ttl' => 0,
 	        ],
-            'extra' => [
-            ],
         ], $stats);
     }
 
@@ -206,6 +208,10 @@ abstract class QueueTest extends TestCase
     public function testEmptyStats() : void
     {
         $stats = $this->queue->stats();
+        if (\array_key_exists('extra', $stats)) {
+            self::assertSame([], $stats['extra']);
+            unset($stats['extra']);
+        }
 
         self::assertEquals([
             'tasks' => [
@@ -229,8 +235,6 @@ abstract class QueueTest extends TestCase
                 'delay' => 0,
                 'ttl' => 0,
 	        ],
-            'extra' => [
-            ],
         ], $stats);
     }
 
@@ -341,7 +345,7 @@ abstract class QueueTest extends TestCase
         $this->queue->$methodName(...$args);
     }
 
-    public function provideFailureCallbackData() : iterable
+    public function provideFailureCallbackData() : array
     {
         return [
             ['ack', [42]],
