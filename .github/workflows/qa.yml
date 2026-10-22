@@ -17,31 +17,47 @@ jobs:
       TNT_IMAGE: tarantool/tarantool:2.11
       PHP_IMAGE: php:8.2-cli
     strategy:
+      fail-fast: false
+      max-parallel: 10
       matrix:
-        operating-system: [ubuntu-latest]
+        operating-system: [ubuntu-24.04]
         env:
+          - TNT_IMAGE: tarantool/tarantool:3.7
+          - TNT_IMAGE: tarantool/tarantool:3.6
+          - TNT_IMAGE: tarantool/tarantool:3.5
+          - TNT_IMAGE: tarantool/tarantool:3.4
+          - TNT_IMAGE: tarantool/tarantool:3.3
+          - TNT_IMAGE: tarantool/tarantool:3.2
+          - TNT_IMAGE: tarantool/tarantool:3.1
+          - TNT_IMAGE: tarantool/tarantool:3.0
+          - TNT_IMAGE: tarantool/tarantool:2.11
+          - TNT_IMAGE: tarantool/tarantool:2.10
+          - TNT_IMAGE: tarantool/tarantool:2.8
+          - TNT_IMAGE: tarantool/tarantool:2.7
+          - TNT_IMAGE: tarantool/tarantool:2.6
+          - TNT_IMAGE: tarantool/tarantool:2.5
+          - TNT_IMAGE: tarantool/tarantool:2.4
+          - TNT_IMAGE: tarantool/tarantool:2.3
+          - TNT_IMAGE: tarantool/tarantool:2.2
+          - TNT_IMAGE: tarantool/tarantool:2.1
+          - TNT_IMAGE: tarantool/tarantool:1
+          - TNT_IMAGE: tarantool/tarantool:1.9
+          - TNT_IMAGE: tarantool/tarantool:1.7
+
+          - PHP_IMAGE: php:8.5-cli
+          - PHP_IMAGE: php:8.4-cli
+
           - PHP_IMAGE: php:8.2-cli
             QA: 1
 
           - COVERAGE_FILE: coverage.xml
-
-          - TNT_IMAGE: tarantool/tarantool:1.7
-          - TNT_IMAGE: tarantool/tarantool:1.9
-          - TNT_IMAGE: tarantool/tarantool:1
-          - TNT_IMAGE: tarantool/tarantool:2.1
-          - TNT_IMAGE: tarantool/tarantool:2.3
-          - TNT_IMAGE: tarantool/tarantool:2.4
-          - TNT_IMAGE: tarantool/tarantool:2.5
-          - TNT_IMAGE: tarantool/tarantool:2.6
-          - TNT_IMAGE: tarantool/tarantool:2.7
-          - TNT_IMAGE: tarantool/tarantool:2.8
-          - TNT_IMAGE: tarantool/tarantool:2.10
+            PHP_IMAGE: php:8.3-cli
 
     name: ${{ matrix.env.PHP_IMAGE || 'php:8.2-cli' }}, ${{ matrix.env.TNT_IMAGE || 'tarantool/tarantool:2.11' }}${{ matrix.env.QA && ', qa' || '' }}${{ matrix.env.COVERAGE_FILE && ', coverage' || '' }}
     runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Build docker image
         env: ${{ matrix.env }}
@@ -79,7 +95,7 @@ jobs:
       statuses: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Download coverage reports
         uses: actions/download-artifact@v8
