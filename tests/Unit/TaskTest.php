@@ -33,7 +33,7 @@ final class TaskTest extends TestCase
         }
     }
 
-    public static function provideTuples() : iterable
+    public static function provideTuples() : array
     {
         return [
             [[0, States::READY, [42]]],
@@ -65,7 +65,7 @@ final class TaskTest extends TestCase
         }
     }
 
-    public static function provideStates() : iterable
+    public static function provideStates() : array
     {
         return [
             [States::READY],

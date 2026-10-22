@@ -28,7 +28,7 @@ abstract class QueueTest extends TestCase
         self::assertTask($task, 0, States::READY, $data);
     }
 
-    public static function provideTaskData() : iterable
+    public static function provideTaskData() : array
     {
         return [
             [null],
@@ -311,7 +311,7 @@ abstract class QueueTest extends TestCase
         $this->queue->stats($path);
     }
 
-    public static function provideStatsInvalidPathData() : iterable
+    public static function provideStatsInvalidPathData() : array
     {
         return [
             [''],
