@@ -15,115 +15,53 @@ namespace Tarantool\Queue;
 
 use Tarantool\Client\Client;
 
-class Queue
+class Queue extends AbstractQueue
 {
-    public function __construct(
-        private readonly Client $client,
-        private readonly string $name,
-    ) {
+    public static function fifo(Client $client, string $name) : FifoQueue
+    {
+        return new FifoQueue($client, $name);
     }
 
-    public function getClient() : Client
+    public static function fifottl(Client $client, string $name) : FifottlQueue
     {
-        return $this->client;
+        return new FifottlQueue($client, $name);
     }
 
-    public function getName() : string
+    public static function utube(Client $client, string $name) : UtubeQueue
     {
-        return $this->name;
+        return new UtubeQueue($client, $name);
     }
 
-    public function put(mixed $data, array $options = []) : Task
+    public static function utubettl(Client $client, string $name) : UtubettlQueue
     {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:put", $data, $options)[0]
-        );
+        return new UtubettlQueue($client, $name);
     }
 
-    public function take(?float $timeout = null) : ?Task
+    public static function limfifottl(Client $client, string $name) : LimfifottlQueue
     {
-        $result = $this->client->call("queue.tube.$this->name:take", $timeout);
-
-        return empty($result[0]) ? null : Task::fromTuple($result[0]);
+        return new LimfifottlQueue($client, $name);
     }
 
-    public function touch(int $taskId, float $increment) : ?Task
+    public static function subqueuettl(Client $client, string $name) : SubqueuettlQueue
     {
-        $result = $this->client->call("queue.tube.$this->name:touch", $taskId, $increment);
-
-        return empty($result[0]) ? null : Task::fromTuple($result[0]);
-    }
-
-    public function ack(int $taskId) : Task
-    {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:ack", $taskId)[0]
-        );
-    }
-
-    public function release(int $taskId, array $options = []) : Task
-    {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:release", $taskId, $options)[0]
-        );
-    }
-
-    public function peek(int $taskId) : Task
-    {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:peek", $taskId)[0]
-        );
-    }
-
-    public function bury(int $taskId) : Task
-    {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:bury", $taskId)[0]
-        );
-    }
-
-    public function kick(int $count) : int
-    {
-        return $this->client->call("queue.tube.$this->name:kick", $count)[0];
-    }
-
-    public function delete(int $taskId) : Task
-    {
-        return Task::fromTuple(
-            $this->client->call("queue.tube.$this->name:delete", $taskId)[0]
-        );
-    }
-
-    public function truncate() : void
-    {
-        $this->client->call("queue.tube.$this->name:truncate");
+        return new SubqueuettlQueue($client, $name);
     }
 
     /**
-     * @throws \InvalidArgumentException
-     *
-     * @return array|int
+     * @param array<string, mixed> $options
      */
-    public function stats(?string $path = null)
+    public function put(mixed $data, array $options = []) : ?Task
     {
-        [$stats] = $this->client->call('queue.stats', $this->name);
+        $result = $this->call('put', $data, $options);
 
-        if (null === $path) {
-            return $stats;
-        }
-
-        foreach (explode('.', $path) as $key) {
-            if (!isset($stats[$key])) {
-                throw new \InvalidArgumentException(\sprintf('Invalid path "%s"', $path));
-            }
-            $stats = $stats[$key];
-        }
-
-        return $stats;
+        return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
-    public function call(string $methodName, ...$args) : array
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function release(int $taskId, array $options = []) : Task
     {
-        return $this->client->call("queue.tube.$this->name:$methodName", ...$args);
+        return Task::fromTuple($this->call('release', $taskId, $options)[0]);
     }
 }

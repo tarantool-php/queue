@@ -72,6 +72,32 @@ $queue = new Queue($client, 'foobar');
 
 where `$client` is an instance of `Tarantool\Client\Client` from the [tarantool/client](https://github.com/tarantool-php/client) package.
 
+If you want PHP to expose only the options supported by a specific built-in queue type, use its typed queue class:
+
+```php
+$queue = Queue::fifottl($client, 'foobar');
+$task = $queue->put('foo', ttl: 60.0, delay: 5.0);
+
+$limitedQueue = Queue::limfifottl($client, 'bounded');
+$taskOrNull = $limitedQueue->put('bar', timeout: 0.0); // null when the queue is full
+```
+
+Typed queue classes describe the queue type expected by the caller; they do not create the tube or verify its server-side type.
+The original `new Queue($client, $name)` API remains available for generic and custom queues.
+With this generic API, PHP does not validate option arrays against the queue type; the server-side driver decides whether to accept them.
+Its `put()` method returns `Task|null` because some drivers can decline a task, for example when a size limit is reached.
+
+For queues with named subqueues, create a `Subqueue` object once and use it for subsequent operations:
+
+```php
+$subqueue = Queue::subqueuettl($client, 'jobs')->subqueue('emails');
+$task = $subqueue->put('send message', ttl: 60.0);
+$task = $subqueue->take(timeout: 2.0);
+$subqueue->ack($task->getId());
+```
+
+Subqueue names do not need to be created in advance. Calling `subqueue()` only creates a PHP object; the driver registers a name when a task is put there. Taking from an empty subqueue returns `null`. The driver takes from one named subqueue at a time and does not provide a take-from-any-subqueue operation.
+
 
 ### Data types
 
