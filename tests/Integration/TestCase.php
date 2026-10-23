@@ -22,11 +22,9 @@ use Tarantool\Queue\Task;
 
 abstract class TestCase extends BaseTestCase
 {
-    /** @var Client|null */
-    private $client;
+    private ?Client $client = null;
 
-    /** @var Queue */
-    protected $queue;
+    protected Queue $queue;
 
     public function getQueueName() : string
     {
@@ -86,12 +84,12 @@ abstract class TestCase extends BaseTestCase
         return $this->queue;
     }
 
-    final protected static function assertTaskInstance($task) : void
+    final protected static function assertTaskInstance(mixed $task) : void
     {
         self::assertInstanceOf(Task::class, $task);
     }
 
-    final protected static function assertTask($task, int $expectedId, string $expectedState, $expectedData) : void
+    final protected static function assertTask(mixed $task, int $expectedId, string $expectedState, mixed $expectedData) : void
     {
         self::assertTaskInstance($task);
         self::assertSame($expectedId, $task->getId());

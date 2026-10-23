@@ -18,11 +18,8 @@ use PHPUnitExtras\Attribute\Target;
 
 final class TubePlaceholderResolver implements PlaceholderResolver
 {
-    private $testCase;
-
-    public function __construct(TestCase $testCase)
+    public function __construct(private readonly TestCase $testCase)
     {
-        $this->testCase = $testCase;
     }
 
     public function getName() : string

@@ -21,7 +21,7 @@ abstract class QueueTest extends TestCase
 {
     #[DataProvider('provideTaskData')]
     #[Lua("create_tube('%tube_name%', '%tube_type%')")]
-    public function testPut($data) : void
+    public function testPut(mixed $data) : void
     {
         $task = $this->queue->put($data);
 
