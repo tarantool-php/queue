@@ -67,6 +67,83 @@ final class TypedQueueTest extends TestCase
         self::assertSame('payload', $task->getData());
     }
 
+    public function testFifottlReleaseSendsOptionalDelay() : void
+    {
+        $taskResponse = TestDoubleFactory::createResponseFromData([[1, 'r', 'payload']]);
+        $client = $this->getTestDoubleClientBuilder()
+            ->shouldSend(
+                new CallRequest('queue.tube.emails:release', [1, ['delay' => 5.0]]),
+                new CallRequest('queue.tube.emails:release', [2, []]),
+            )
+            ->willReceive($taskResponse, $taskResponse)
+            ->build();
+        $queue = Queue::fifottl($client, 'emails');
+
+        self::assertInstanceOf(Task::class, $queue->release(1, delay: 5.0));
+        self::assertInstanceOf(Task::class, $queue->release(2));
+    }
+
+    public function testFifoPutAndReleaseUseOptionlessCalls() : void
+    {
+        $taskResponse = TestDoubleFactory::createResponseFromData([[1, 'r', 'payload']]);
+        $client = $this->getTestDoubleClientBuilder()
+            ->shouldSend(
+                new CallRequest('queue.tube.events:put', ['payload']),
+                new CallRequest('queue.tube.events:release', [1]),
+            )
+            ->willReceive($taskResponse, $taskResponse)
+            ->build();
+        $queue = Queue::fifo($client, 'events');
+
+        self::assertInstanceOf(Task::class, $queue->put('payload'));
+        self::assertInstanceOf(Task::class, $queue->release(1));
+    }
+
+    public function testUtubePutAndReleasePassSubqueueOptions() : void
+    {
+        $taskResponse = TestDoubleFactory::createResponseFromData([[1, 'r', 'payload']]);
+        $client = $this->getTestDoubleClientBuilder()
+            ->shouldSend(
+                new CallRequest('queue.tube.events:put', ['payload', ['utube' => 'domain-a']]),
+                new CallRequest('queue.tube.events:release', [1, []]),
+            )
+            ->willReceive($taskResponse, $taskResponse)
+            ->build();
+        $queue = Queue::utube($client, 'events');
+
+        self::assertInstanceOf(Task::class, $queue->put('payload', 'domain-a'));
+        self::assertInstanceOf(Task::class, $queue->release(1));
+    }
+
+    public function testUtubettlPutAndReleasePassTypedOptions() : void
+    {
+        $taskResponse = TestDoubleFactory::createResponseFromData([[1, 'r', 'payload']]);
+        $client = $this->getTestDoubleClientBuilder()
+            ->shouldSend(
+                new CallRequest('queue.tube.events:put', ['payload', [
+                    'utube' => 'domain-a',
+                    'pri' => 2,
+                    'ttl' => 60.0,
+                    'ttr' => 10.0,
+                    'delay' => 5.0,
+                ]]),
+                new CallRequest('queue.tube.events:release', [1, ['delay' => 5.0]]),
+            )
+            ->willReceive($taskResponse, $taskResponse)
+            ->build();
+        $queue = Queue::utubettl($client, 'events');
+
+        self::assertInstanceOf(Task::class, $queue->put(
+            'payload',
+            'domain-a',
+            pri: 2,
+            ttl: 60.0,
+            ttr: 10.0,
+            delay: 5.0,
+        ));
+        self::assertInstanceOf(Task::class, $queue->release(1, delay: 5.0));
+    }
+
     public function testLimfifottlPutReturnsNullWhenQueueIsFull() : void
     {
         $client = $this->getTestDoubleClientBuilder()
@@ -87,6 +164,22 @@ final class TypedQueueTest extends TestCase
         self::assertNull((new Queue($client, 'bounded'))->put('payload', ['timeout' => 0.0]));
     }
 
+    public function testLimfifottlReleasePassesOptionalDelay() : void
+    {
+        $taskResponse = TestDoubleFactory::createResponseFromData([[1, 'r', 'payload']]);
+        $client = $this->getTestDoubleClientBuilder()
+            ->shouldSend(
+                new CallRequest('queue.tube.bounded:release', [1, ['delay' => 5.0]]),
+                new CallRequest('queue.tube.bounded:release', [2, []]),
+            )
+            ->willReceive($taskResponse, $taskResponse)
+            ->build();
+        $queue = Queue::limfifottl($client, 'bounded');
+
+        self::assertInstanceOf(Task::class, $queue->release(1, delay: 5.0));
+        self::assertInstanceOf(Task::class, $queue->release(2));
+    }
+
     public function testSubqueueBindsContextToOperations() : void
     {
         $taskTuple = [[7, 'r', 'payload']];
@@ -96,8 +189,9 @@ final class TypedQueueTest extends TestCase
                 new CallRequest('queue.tube.jobs:put', ['payload', ['subqueue' => 'emails', 'ttl' => 60.0]]),
                 new CallRequest('queue.tube.jobs:take', [2.0, ['subqueue' => 'emails']]),
                 new CallRequest('queue.tube.jobs:ack', [7, ['subqueue' => 'emails']]),
+                new CallRequest('queue.tube.jobs:touch', [7, 1.0, ['subqueue' => 'emails']]),
             )
-            ->willReceive($response, $response, $response)
+            ->willReceive($response, $response, $response, $response)
             ->build();
 
         $subqueue = Queue::subqueuettl($client, 'jobs')->subqueue('emails');
@@ -106,5 +200,24 @@ final class TypedQueueTest extends TestCase
         self::assertInstanceOf(Task::class, $subqueue->put('payload', ttl: 60.0));
         self::assertInstanceOf(Task::class, $subqueue->take(timeout: 2.0));
         self::assertInstanceOf(Task::class, $subqueue->ack(7));
+        self::assertInstanceOf(Task::class, $subqueue->touch(7, 1.0));
+    }
+
+    public function testSubqueueReleaseKeepsContextAndAddsOptionalDelay() : void
+    {
+        $taskResponse = TestDoubleFactory::createResponseFromData([[7, 'r', 'payload']]);
+        $client = $this->getTestDoubleClientBuilder()
+            ->shouldSend(
+                new CallRequest('queue.tube.jobs:release', [7, ['subqueue' => 'emails', 'delay' => 5.0]]),
+                new CallRequest('queue.tube.jobs:release', [8, ['subqueue' => 'emails']]),
+                new CallRequest('queue.tube.jobs:truncate', [['subqueue' => 'emails']]),
+            )
+            ->willReceive($taskResponse, $taskResponse, TestDoubleFactory::createEmptyResponse())
+            ->build();
+        $subqueue = Queue::subqueuettl($client, 'jobs')->subqueue('emails');
+
+        self::assertInstanceOf(Task::class, $subqueue->release(7, delay: 5.0));
+        self::assertInstanceOf(Task::class, $subqueue->release(8));
+        $subqueue->truncate();
     }
 }
