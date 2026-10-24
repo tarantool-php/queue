@@ -22,9 +22,9 @@ class Queue extends AbstractQueue
         return new FifoQueue($client, $name);
     }
 
-    public static function fifoTtl(Client $client, string $name) : FifottlQueue
+    public static function fifoTtl(Client $client, string $name) : FifoTtlQueue
     {
-        return new FifottlQueue($client, $name);
+        return new FifoTtlQueue($client, $name);
     }
 
     public static function utube(Client $client, string $name) : UtubeQueue
@@ -32,19 +32,19 @@ class Queue extends AbstractQueue
         return new UtubeQueue($client, $name);
     }
 
-    public static function utubeTtl(Client $client, string $name) : UtubettlQueue
+    public static function utubeTtl(Client $client, string $name) : UtubeTtlQueue
     {
-        return new UtubettlQueue($client, $name);
+        return new UtubeTtlQueue($client, $name);
     }
 
-    public static function limFifoTtl(Client $client, string $name) : LimfifottlQueue
+    public static function limFifoTtl(Client $client, string $name) : LimFifoTtlQueue
     {
-        return new LimfifottlQueue($client, $name);
+        return new LimFifoTtlQueue($client, $name);
     }
 
-    public static function subqueueTtl(Client $client, string $name) : SubqueuettlQueue
+    public static function subqueueTtl(Client $client, string $name) : SubqueueTtlQueue
     {
-        return new SubqueuettlQueue($client, $name);
+        return new SubqueueTtlQueue($client, $name);
     }
 
     /**

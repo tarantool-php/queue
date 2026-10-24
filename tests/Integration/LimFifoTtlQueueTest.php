@@ -17,7 +17,7 @@ use Tarantool\PhpUnit\Attribute\Lua;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
-final class LimfifottlQueueTest extends TestCase
+final class LimFifoTtlQueueTest extends TestCase
 {
     #[Lua("create_tube('%tube_name%', '%tube_type%', {capacity = 1})")]
     public function testPutReturnsNullWhenCapacityIsReached() : void

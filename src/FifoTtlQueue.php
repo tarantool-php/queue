@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue;
 
-final class LimfifottlQueue extends AbstractQueue
+final class FifoTtlQueue extends AbstractQueue
 {
     public function put(
         mixed $data,
@@ -21,18 +21,15 @@ final class LimfifottlQueue extends AbstractQueue
         ?float $ttl = null,
         ?float $ttr = null,
         ?float $delay = null,
-        ?float $timeout = null,
-    ) : ?Task {
+    ) : Task {
         $options = array_filter([
             'pri' => $pri,
             'ttl' => $ttl,
             'ttr' => $ttr,
             'delay' => $delay,
-            'timeout' => $timeout,
         ], static fn ($value) => null !== $value);
-        $result = $this->call('put', $data, $options);
 
-        return empty($result[0]) ? null : Task::fromTuple($result[0]);
+        return Task::fromTuple($this->call('put', $data, $options)[0]);
     }
 
     public function release(int $taskId, ?float $delay = null) : Task

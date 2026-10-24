@@ -15,7 +15,7 @@ namespace Tarantool\Queue;
 
 use Tarantool\Client\Client;
 
-final class SubqueuettlQueue
+final class SubqueueTtlQueue
 {
     public function __construct(
         private readonly Client $client,

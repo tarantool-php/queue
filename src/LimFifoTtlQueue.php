@@ -13,25 +13,26 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue;
 
-final class UtubettlQueue extends AbstractQueue
+final class LimFifoTtlQueue extends AbstractQueue
 {
     public function put(
         mixed $data,
-        string $utube,
         ?int $pri = null,
         ?float $ttl = null,
         ?float $ttr = null,
         ?float $delay = null,
-    ) : Task {
+        ?float $timeout = null,
+    ) : ?Task {
         $options = array_filter([
-            'utube' => $utube,
             'pri' => $pri,
             'ttl' => $ttl,
             'ttr' => $ttr,
             'delay' => $delay,
+            'timeout' => $timeout,
         ], static fn ($value) => null !== $value);
+        $result = $this->call('put', $data, $options);
 
-        return Task::fromTuple($this->call('put', $data, $options)[0]);
+        return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
     public function release(int $taskId, ?float $delay = null) : Task

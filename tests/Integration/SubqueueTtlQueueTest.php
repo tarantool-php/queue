@@ -17,7 +17,7 @@ use Tarantool\PhpUnit\Attribute\Lua;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
-final class SubqueuettlQueueTest extends TestCase
+final class SubqueueTtlQueueTest extends TestCase
 {
     #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
     public function testTakeFromNewSubqueueReturnsNull() : void

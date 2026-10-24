@@ -18,14 +18,14 @@ use Tarantool\Client\Request\CallRequest;
 use Tarantool\PhpUnit\Client\TestDoubleClient;
 use Tarantool\PhpUnit\Client\TestDoubleFactory;
 use Tarantool\Queue\FifoQueue;
-use Tarantool\Queue\FifottlQueue;
-use Tarantool\Queue\LimfifottlQueue;
+use Tarantool\Queue\FifoTtlQueue;
+use Tarantool\Queue\LimFifoTtlQueue;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\Subqueue;
-use Tarantool\Queue\SubqueuettlQueue;
+use Tarantool\Queue\SubqueueTtlQueue;
 use Tarantool\Queue\Task;
 use Tarantool\Queue\UtubeQueue;
-use Tarantool\Queue\UtubettlQueue;
+use Tarantool\Queue\UtubeTtlQueue;
 
 final class TypedQueueTest extends TestCase
 {
@@ -36,11 +36,11 @@ final class TypedQueueTest extends TestCase
         $client = $this->createDummyClient();
 
         self::assertInstanceOf(FifoQueue::class, Queue::fifo($client, 'fifo'));
-        self::assertInstanceOf(FifottlQueue::class, Queue::fifoTtl($client, 'fifottl'));
+        self::assertInstanceOf(FifoTtlQueue::class, Queue::fifoTtl($client, 'fifottl'));
         self::assertInstanceOf(UtubeQueue::class, Queue::utube($client, 'utube'));
-        self::assertInstanceOf(UtubettlQueue::class, Queue::utubeTtl($client, 'utubettl'));
-        self::assertInstanceOf(LimfifottlQueue::class, Queue::limFifoTtl($client, 'limfifottl'));
-        self::assertInstanceOf(SubqueuettlQueue::class, Queue::subqueueTtl($client, 'subqueuettl'));
+        self::assertInstanceOf(UtubeTtlQueue::class, Queue::utubeTtl($client, 'utubettl'));
+        self::assertInstanceOf(LimFifoTtlQueue::class, Queue::limFifoTtl($client, 'limfifottl'));
+        self::assertInstanceOf(SubqueueTtlQueue::class, Queue::subqueueTtl($client, 'subqueuettl'));
     }
 
     public function testFifottlPutSendsNamedOptions() : void

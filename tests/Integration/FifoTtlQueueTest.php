@@ -17,7 +17,7 @@ use Tarantool\PhpUnit\Attribute\Lua;
 use Tarantool\Queue\Queue;
 use Tarantool\Queue\States;
 
-final class FifottlQueueTest extends QueueTest
+final class FifoTtlQueueTest extends QueueTest
 {
     use Ttl;
 

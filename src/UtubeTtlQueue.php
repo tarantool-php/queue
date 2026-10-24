@@ -13,16 +13,18 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue;
 
-final class FifottlQueue extends AbstractQueue
+final class UtubeTtlQueue extends AbstractQueue
 {
     public function put(
         mixed $data,
+        string $utube,
         ?int $pri = null,
         ?float $ttl = null,
         ?float $ttr = null,
         ?float $delay = null,
     ) : Task {
         $options = array_filter([
+            'utube' => $utube,
             'pri' => $pri,
             'ttl' => $ttl,
             'ttr' => $ttr,

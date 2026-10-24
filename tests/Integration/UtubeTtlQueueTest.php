@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Tarantool\Queue\Tests\Integration;
 
-final class UtubettlQueueTest extends QueueTest
+final class UtubeTtlQueueTest extends QueueTest
 {
     use Ttl;
 }
