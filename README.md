@@ -140,8 +140,17 @@ Task::isDelayed()
 
 ### Producer API
 
-For built-in queue types, use the typed queue class and named parameters, as in the `fifottl` example above. For custom
-drivers or the generic API, `put()` accepts the task data and an optional options array:
+For built-in queue types, use the typed queue class and named parameters. For example, the `fifottl` queue, which we
+defined [earlier](#before-you-start) in our Lua configuration, supports `delay`, `ttl`, `ttr`, and `pri`:
+
+```php
+$queue = Queue::fifoTtl($client, 'foobar');
+$queue->put('foo', delay: 30.0);
+$queue->put('bar', ttl: 5.0);
+$queue->put('baz', ttr: 10.0, pri: 42);
+```
+
+For custom drivers or the generic API, `put()` accepts the task data and an optional options array:
 
 ```php
 use Tarantool\Queue\Options;
