@@ -194,7 +194,7 @@ If the task cannot be executed, return it to the queue:
 $task = $queue->release($task->getId());
 
 // For *ttl queues, you can specify a delay.
-$task = $queue->release($task->getId(), ['delay' => 30.0]);
+$task = $queue->release($task->getId(), delay: 30.0);
 ```
 
 To view a task without changing its state, use:
