@@ -22,7 +22,7 @@ final class SubqueuettlQueueTest extends TestCase
     #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
     public function testTakeFromNewSubqueueReturnsNull() : void
     {
-        $subqueue = Queue::subqueuettl($this->getClient(), $this->getQueueName())
+        $subqueue = Queue::subqueueTtl($this->getClient(), $this->getQueueName())
             ->subqueue('created-on-first-put');
 
         self::assertNull($subqueue->take(0.0));
@@ -31,7 +31,7 @@ final class SubqueuettlQueueTest extends TestCase
     #[Lua("tube = create_tube('%tube_name%', '%tube_type%')")]
     public function testSubqueueRoutesOperations() : void
     {
-        $subqueue = Queue::subqueuettl($this->getClient(), $this->getQueueName())
+        $subqueue = Queue::subqueueTtl($this->getClient(), $this->getQueueName())
             ->subqueue('emails');
 
         self::assertTask($subqueue->put('typed', ttl: 60.0), 0, States::READY, 'typed');

@@ -22,7 +22,7 @@ final class LimfifottlQueueTest extends TestCase
     #[Lua("create_tube('%tube_name%', '%tube_type%', {capacity = 1})")]
     public function testPutReturnsNullWhenCapacityIsReached() : void
     {
-        $queue = Queue::limfifottl($this->getClient(), $this->getQueueName());
+        $queue = Queue::limFifoTtl($this->getClient(), $this->getQueueName());
 
         self::assertTask($queue->put('first'), 0, States::READY, 'first');
         self::assertNull($queue->put('second', timeout: 0.0));

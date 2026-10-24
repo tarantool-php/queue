@@ -36,11 +36,11 @@ final class TypedQueueTest extends TestCase
         $client = $this->createDummyClient();
 
         self::assertInstanceOf(FifoQueue::class, Queue::fifo($client, 'fifo'));
-        self::assertInstanceOf(FifottlQueue::class, Queue::fifottl($client, 'fifottl'));
+        self::assertInstanceOf(FifottlQueue::class, Queue::fifoTtl($client, 'fifottl'));
         self::assertInstanceOf(UtubeQueue::class, Queue::utube($client, 'utube'));
-        self::assertInstanceOf(UtubettlQueue::class, Queue::utubettl($client, 'utubettl'));
-        self::assertInstanceOf(LimfifottlQueue::class, Queue::limfifottl($client, 'limfifottl'));
-        self::assertInstanceOf(SubqueuettlQueue::class, Queue::subqueuettl($client, 'subqueuettl'));
+        self::assertInstanceOf(UtubettlQueue::class, Queue::utubeTtl($client, 'utubettl'));
+        self::assertInstanceOf(LimfifottlQueue::class, Queue::limFifoTtl($client, 'limfifottl'));
+        self::assertInstanceOf(SubqueuettlQueue::class, Queue::subqueueTtl($client, 'subqueuettl'));
     }
 
     public function testFifottlPutSendsNamedOptions() : void
@@ -55,7 +55,7 @@ final class TypedQueueTest extends TestCase
             ->willReceive(TestDoubleFactory::createResponseFromData([[7, 'r', 'payload']]))
             ->build();
 
-        $task = Queue::fifottl($client, 'emails')->put(
+        $task = Queue::fifoTtl($client, 'emails')->put(
             'payload',
             pri: 2,
             ttl: 60.0,
@@ -77,7 +77,7 @@ final class TypedQueueTest extends TestCase
             )
             ->willReceive($taskResponse, $taskResponse)
             ->build();
-        $queue = Queue::fifottl($client, 'emails');
+        $queue = Queue::fifoTtl($client, 'emails');
 
         self::assertInstanceOf(Task::class, $queue->release(1, delay: 5.0));
         self::assertInstanceOf(Task::class, $queue->release(2));
@@ -131,7 +131,7 @@ final class TypedQueueTest extends TestCase
             )
             ->willReceive($taskResponse, $taskResponse)
             ->build();
-        $queue = Queue::utubettl($client, 'events');
+        $queue = Queue::utubeTtl($client, 'events');
 
         self::assertInstanceOf(Task::class, $queue->put(
             'payload',
@@ -151,7 +151,7 @@ final class TypedQueueTest extends TestCase
             ->willReceive(TestDoubleFactory::createEmptyResponse())
             ->build();
 
-        self::assertNull(Queue::limfifottl($client, 'bounded')->put('payload', timeout: 0.0));
+        self::assertNull(Queue::limFifoTtl($client, 'bounded')->put('payload', timeout: 0.0));
     }
 
     public function testGenericQueuePutCanReturnNull() : void
@@ -174,7 +174,7 @@ final class TypedQueueTest extends TestCase
             )
             ->willReceive($taskResponse, $taskResponse)
             ->build();
-        $queue = Queue::limfifottl($client, 'bounded');
+        $queue = Queue::limFifoTtl($client, 'bounded');
 
         self::assertInstanceOf(Task::class, $queue->release(1, delay: 5.0));
         self::assertInstanceOf(Task::class, $queue->release(2));
@@ -194,7 +194,7 @@ final class TypedQueueTest extends TestCase
             ->willReceive($response, $response, $response, $response)
             ->build();
 
-        $subqueue = Queue::subqueuettl($client, 'jobs')->subqueue('emails');
+        $subqueue = Queue::subqueueTtl($client, 'jobs')->subqueue('emails');
 
         self::assertInstanceOf(Subqueue::class, $subqueue);
         self::assertInstanceOf(Task::class, $subqueue->put('payload', ttl: 60.0));
@@ -214,7 +214,7 @@ final class TypedQueueTest extends TestCase
             )
             ->willReceive($taskResponse, $taskResponse, TestDoubleFactory::createEmptyResponse())
             ->build();
-        $subqueue = Queue::subqueuettl($client, 'jobs')->subqueue('emails');
+        $subqueue = Queue::subqueueTtl($client, 'jobs')->subqueue('emails');
 
         self::assertInstanceOf(Task::class, $subqueue->release(7, delay: 5.0));
         self::assertInstanceOf(Task::class, $subqueue->release(8));

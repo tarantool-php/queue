@@ -72,13 +72,13 @@ $queue = new Queue($client, 'foobar');
 
 where `$client` is an instance of `Tarantool\Client\Client` from the [tarantool/client](https://github.com/tarantool-php/client) package.
 
-If you want PHP to expose only the options supported by a specific built-in queue type, use its typed queue class:
+Use a typed queue factory when you want the method signature to show only the options supported by a built-in queue type:
 
 ```php
-$queue = Queue::fifottl($client, 'foobar');
+$queue = Queue::fifoTtl($client, 'foobar');
 $task = $queue->put('foo', ttl: 60.0, delay: 5.0);
 
-$limitedQueue = Queue::limfifottl($client, 'bounded');
+$limitedQueue = Queue::limFifoTtl($client, 'bounded');
 $taskOrNull = $limitedQueue->put('bar', timeout: 0.0); // null when the queue is full
 ```
 
@@ -90,13 +90,13 @@ Its `put()` method returns `Task|null` because some drivers can decline a task, 
 For queues with named subqueues, create a `Subqueue` object once and use it for subsequent operations:
 
 ```php
-$subqueue = Queue::subqueuettl($client, 'jobs')->subqueue('emails');
+$subqueue = Queue::subqueueTtl($client, 'jobs')->subqueue('emails');
 $task = $subqueue->put('send message', ttl: 60.0);
 $task = $subqueue->take(timeout: 2.0);
 $subqueue->ack($task->getId());
 ```
 
-Subqueue names do not need to be created in advance. Calling `subqueue()` only creates a PHP object; the driver registers a name when a task is put there. Taking from an empty subqueue returns `null`. The driver takes from one named subqueue at a time and does not provide a take-from-any-subqueue operation.
+Subqueue names do not need to be created in advance. Calling `subqueue()` only creates a PHP object; the first `put()` adds a task under that name. Taking from an empty subqueue returns `null`. The driver takes from one named subqueue at a time and does not provide a take-from-any-subqueue operation.
 
 
 ### Data types
@@ -141,16 +141,17 @@ Task::isDelayed()
 
 ### Producer API
 
-As you've already seen, to insert a task into a queue, call the `put()` method. It accepts two arguments: the data you
-want to process and an optional array of task options supported by the queue. For example, the `fifottl` queue, which
-we defined [earlier](#before-you-start) in our Lua configuration, supports the `delay`, `ttl`, `ttr`, and `pri` options:
+With the generic `Queue` API, `put()` accepts the task data and an optional array of task options. For example, the
+`fifottl` queue, which we defined [earlier](#before-you-start) in our Lua configuration, supports the `delay`, `ttl`,
+`ttr`, and `pri` options:
 
 ```php
 use Tarantool\Queue\Options;
 
-$queue->put('foo', [Options::DELAY => 30.0]);
-$queue->put('bar', [Options::TTL => 5.0]);
-$queue->put('baz', [Options::TTR => 10.0, Options::PRI => 42]);
+$genericQueue = new Queue($client, 'foobar');
+$genericQueue->put('foo', [Options::DELAY => 30.0]);
+$genericQueue->put('bar', [Options::TTL => 5.0]);
+$genericQueue->put('baz', [Options::TTR => 10.0, Options::PRI => 42]);
 ```
 
 > *See the [full list of available options](https://github.com/tarantool/queue#queue-types).*

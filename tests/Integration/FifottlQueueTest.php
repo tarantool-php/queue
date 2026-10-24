@@ -24,7 +24,7 @@ final class FifottlQueueTest extends QueueTest
     #[Lua("create_tube('%tube_name%', '%tube_type%')")]
     public function testTypedQueuePut() : void
     {
-        $queue = Queue::fifottl($this->getClient(), $this->getQueueName());
+        $queue = Queue::fifoTtl($this->getClient(), $this->getQueueName());
         $task = $queue->put('typed', ttl: 60.0, pri: 0);
 
         self::assertTask($task, 0, States::READY, 'typed');
