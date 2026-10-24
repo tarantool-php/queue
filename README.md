@@ -85,7 +85,6 @@ $taskOrNull = $limitedQueue->put('bar', timeout: 0.0); // null when the queue is
 Typed queue classes describe the queue type expected by the caller; they do not create the tube or verify its server-side type.
 The original `new Queue($client, $name)` API remains available for generic and custom queues.
 With this generic API, PHP does not validate option arrays against the queue type; the server-side driver decides whether to accept them.
-Its `put()` method returns `Task|null` because some drivers can decline a task, for example when a size limit is reached.
 
 For queues with named subqueues, create a `Subqueue` object once and use it for subsequent operations:
 
@@ -141,9 +140,8 @@ Task::isDelayed()
 
 ### Producer API
 
-With the generic `Queue` API, `put()` accepts the task data and an optional array of task options. For example, the
-`fifottl` queue, which we defined [earlier](#before-you-start) in our Lua configuration, supports the `delay`, `ttl`,
-`ttr`, and `pri` options:
+For built-in queue types, use the typed queue class and named parameters, as in the `fifottl` example above. For custom
+drivers or the generic API, `put()` accepts the task data and an optional options array:
 
 ```php
 use Tarantool\Queue\Options;
