@@ -153,12 +153,10 @@ $queue->put('baz', ttr: 10.0, pri: 42);
 For custom drivers or the generic API, `put()` accepts the task data and an optional options array:
 
 ```php
-use Tarantool\Queue\Options;
-
-$genericQueue = new Queue($client, 'foobar');
-$genericQueue->put('foo', [Options::DELAY => 30.0]);
-$genericQueue->put('bar', [Options::TTL => 5.0]);
-$genericQueue->put('baz', [Options::TTR => 10.0, Options::PRI => 42]);
+$queue = new Queue($client, 'foobar');
+$queue->put('foo', ['delay' => 30.0]);
+$queue->put('bar', ['ttl' => 5.0]);
+$queue->put('baz', ['ttr' => 10.0, 'pri' => 42]);
 ```
 
 > *See the [full list of available options](https://github.com/tarantool/queue#queue-types).*
@@ -196,7 +194,7 @@ If the task cannot be executed, return it to the queue:
 $task = $queue->release($task->getId());
 
 // For *ttl queues, you can specify a delay.
-$task = $queue->release($task->getId(), [Options::DELAY => 30.0]);
+$task = $queue->release($task->getId(), ['delay' => 30.0]);
 ```
 
 To view a task without changing its state, use:
@@ -266,6 +264,7 @@ The result of this call might look like this:
         'take' => 1,
         ...
     ],
+    'extra' => [],
 ]
 ```
 
@@ -305,7 +304,7 @@ To invoke this method from PHP, use `Queue::call()`:
 
 ```php
 $result = $queue->call('put_many', [
-    'foo' => ['foo', [Options::DELAY => 30.0]],
+    'foo' => ['foo', ['delay' => 30.0]],
     'bar' => ['bar'],
 ]);
 ```
