@@ -17,9 +17,6 @@ use Tarantool\Client\Client;
 
 abstract class AbstractQueue
 {
-    /** @var array<string, mixed> */
-    protected array $context = [];
-
     public function __construct(
         private readonly Client $client,
         private readonly string $name,
@@ -38,60 +35,46 @@ abstract class AbstractQueue
 
     public function take(?float $timeout = null) : ?Task
     {
-        $args = [$timeout];
-        if ([] !== $this->context) {
-            $args[] = $this->context;
-        }
-
-        $result = $this->call('take', ...$args);
+        $result = $this->call('take', $timeout);
 
         return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
     public function touch(int $taskId, float $increment) : ?Task
     {
-        $args = [$taskId, $increment];
-        if ([] !== $this->context) {
-            $args[] = $this->context;
-        }
-
-        $result = $this->call('touch', ...$args);
+        $result = $this->call('touch', $taskId, $increment);
 
         return empty($result[0]) ? null : Task::fromTuple($result[0]);
     }
 
     public function ack(int $taskId) : Task
     {
-        return Task::fromTuple($this->callWithContext('ack', $taskId)[0]);
+        return Task::fromTuple($this->call('ack', $taskId)[0]);
     }
 
     public function peek(int $taskId) : Task
     {
-        return Task::fromTuple($this->callWithContext('peek', $taskId)[0]);
+        return Task::fromTuple($this->call('peek', $taskId)[0]);
     }
 
     public function bury(int $taskId) : Task
     {
-        return Task::fromTuple($this->callWithContext('bury', $taskId)[0]);
+        return Task::fromTuple($this->call('bury', $taskId)[0]);
     }
 
     public function kick(int $count) : int
     {
-        return $this->callWithContext('kick', $count)[0];
+        return $this->call('kick', $count)[0];
     }
 
     public function delete(int $taskId) : Task
     {
-        return Task::fromTuple($this->callWithContext('delete', $taskId)[0]);
+        return Task::fromTuple($this->call('delete', $taskId)[0]);
     }
 
     public function truncate() : void
     {
-        $args = [];
-        if ([] !== $this->context) {
-            $args[] = $this->context;
-        }
-        $this->call('truncate', ...$args);
+        $this->call('truncate');
     }
 
     /**
@@ -120,24 +103,5 @@ abstract class AbstractQueue
     public function call(string $methodName, ...$args) : array
     {
         return $this->client->call("queue.tube.$this->name:$methodName", ...$args);
-    }
-
-    private function callWithContext(string $methodName, mixed ...$args) : array
-    {
-        if ([] !== $this->context) {
-            $args[] = $this->context;
-        }
-
-        return $this->call($methodName, ...$args);
-    }
-
-    /**
-     * @param array<string, mixed> $options
-     *
-     * @return array<string, mixed>
-     */
-    protected function withContext(array $options) : array
-    {
-        return $this->context + $options;
     }
 }
